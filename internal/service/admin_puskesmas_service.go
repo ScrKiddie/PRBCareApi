@@ -43,12 +43,12 @@ func (s *AdminPuskesmasService) List(ctx context.Context) (*[]model.AdminPuskesm
 	}
 
 	var response []model.AdminPuskesmasResponse
-	for _, admin := range *adminPuskesmas {
+	for _, a := range *adminPuskesmas {
 		response = append(response, model.AdminPuskesmasResponse{
-			ID:            admin.ID,
-			NamaPuskesmas: admin.NamaPuskesmas,
-			Telepon:       admin.Telepon,
-			Alamat:        admin.Alamat,
+			ID:            a.ID,
+			NamaPuskesmas: a.NamaPuskesmas,
+			Telepon:       a.Telepon,
+			Alamat:        a.Alamat,
 		})
 	}
 
@@ -80,14 +80,14 @@ func (s *AdminPuskesmasService) Get(ctx context.Context, request *model.AdminPus
 		return nil, fiber.ErrInternalServerError
 	}
 
-	adminPuskesmasResponse := new(model.AdminPuskesmasResponse)
-	adminPuskesmasResponse.ID = adminPuskesmas.ID
-	adminPuskesmasResponse.Username = adminPuskesmas.Username
-	adminPuskesmasResponse.NamaPuskesmas = adminPuskesmas.NamaPuskesmas
-	adminPuskesmasResponse.Alamat = adminPuskesmas.Alamat
-	adminPuskesmasResponse.Telepon = adminPuskesmas.Telepon
+	response := new(model.AdminPuskesmasResponse)
+	response.ID = adminPuskesmas.ID
+	response.Username = adminPuskesmas.Username
+	response.NamaPuskesmas = adminPuskesmas.NamaPuskesmas
+	response.Alamat = adminPuskesmas.Alamat
+	response.Telepon = adminPuskesmas.Telepon
 
-	return adminPuskesmasResponse, nil
+	return response, nil
 }
 
 func (s *AdminPuskesmasService) Create(ctx context.Context, request *model.AdminPuskesmasCreateRequest) error {
@@ -323,12 +323,12 @@ func (s *AdminPuskesmasService) Current(ctx context.Context, request *model.Admi
 		return nil, fiber.ErrInternalServerError
 	}
 
-	adminPuskesmasResponse := new(model.AdminPuskesmasResponse)
-	adminPuskesmasResponse.NamaPuskesmas = adminPuskesmas.NamaPuskesmas
-	adminPuskesmasResponse.Alamat = adminPuskesmas.Alamat
-	adminPuskesmasResponse.Telepon = adminPuskesmas.Telepon
+	response := new(model.AdminPuskesmasResponse)
+	response.NamaPuskesmas = adminPuskesmas.NamaPuskesmas
+	response.Alamat = adminPuskesmas.Alamat
+	response.Telepon = adminPuskesmas.Telepon
 
-	return adminPuskesmasResponse, nil
+	return response, nil
 }
 
 func (s *AdminPuskesmasService) CurrentProfileUpdate(ctx context.Context, request *model.AdminPuskesmasProfileUpdateRequest) error {

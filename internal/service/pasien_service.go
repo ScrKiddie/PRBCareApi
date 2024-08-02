@@ -62,30 +62,30 @@ func (s *PasienService) Search(ctx context.Context, request *model.PasienSearchR
 	}
 
 	var response []model.PasienResponse
-	for _, perPasien := range *pasien {
+	for _, p := range *pasien {
 		response = append(response, model.PasienResponse{
-			ID:             perPasien.ID,
-			NoRekamMedis:   perPasien.NoRekamMedis,
-			BeratBadan:     perPasien.BeratBadan,
-			TinggiBadan:    perPasien.TinggiBadan,
-			TekananDarah:   perPasien.TekananDarah,
-			DenyutNadi:     perPasien.DenyutNadi,
-			HasilLab:       perPasien.HasilLab,
-			HasilEkg:       perPasien.HasilEkg,
-			TanggalPeriksa: perPasien.TanggalPeriksa,
-			Status:         perPasien.Status,
+			ID:             p.ID,
+			NoRekamMedis:   p.NoRekamMedis,
+			BeratBadan:     p.BeratBadan,
+			TinggiBadan:    p.TinggiBadan,
+			TekananDarah:   p.TekananDarah,
+			DenyutNadi:     p.DenyutNadi,
+			HasilLab:       p.HasilLab,
+			HasilEkg:       p.HasilEkg,
+			TanggalPeriksa: p.TanggalPeriksa,
+			Status:         p.Status,
 			Pengguna: &model.PenggunaResponse{
-				ID:              perPasien.Pengguna.ID,
-				NamaLengkap:     perPasien.Pengguna.NamaLengkap,
-				Telepon:         perPasien.Pengguna.Telepon,
-				TeleponKeluarga: perPasien.Pengguna.TeleponKeluarga,
-				Alamat:          perPasien.Pengguna.Alamat,
+				ID:              p.Pengguna.ID,
+				NamaLengkap:     p.Pengguna.NamaLengkap,
+				Telepon:         p.Pengguna.Telepon,
+				TeleponKeluarga: p.Pengguna.TeleponKeluarga,
+				Alamat:          p.Pengguna.Alamat,
 			},
 			AdminPuskesmas: &model.AdminPuskesmasResponse{
-				ID:            perPasien.AdminPuskesmas.ID,
-				NamaPuskesmas: perPasien.AdminPuskesmas.NamaPuskesmas,
-				Telepon:       perPasien.AdminPuskesmas.Telepon,
-				Alamat:        perPasien.AdminPuskesmas.Alamat,
+				ID:            p.AdminPuskesmas.ID,
+				NamaPuskesmas: p.AdminPuskesmas.NamaPuskesmas,
+				Telepon:       p.AdminPuskesmas.Telepon,
+				Alamat:        p.AdminPuskesmas.Alamat,
 			},
 		})
 	}
@@ -123,20 +123,20 @@ func (s *PasienService) Get(ctx context.Context, request *model.PasienGetRequest
 		return nil, fiber.ErrInternalServerError
 	}
 
-	pasienResponse := new(model.PasienResponse)
-	pasienResponse.ID = pasien.ID
-	pasienResponse.NoRekamMedis = pasien.NoRekamMedis
-	pasienResponse.BeratBadan = pasien.BeratBadan
-	pasienResponse.TinggiBadan = pasien.TinggiBadan
-	pasienResponse.TekananDarah = pasien.TekananDarah
-	pasienResponse.DenyutNadi = pasien.DenyutNadi
-	pasienResponse.HasilLab = pasien.HasilLab
-	pasienResponse.HasilEkg = pasien.HasilEkg
-	pasienResponse.TanggalPeriksa = pasien.TanggalPeriksa
-	pasienResponse.IdAdminPuskesmas = pasien.IdAdminPuskesmas
-	pasienResponse.IdPengguna = pasien.IdPengguna
+	response := new(model.PasienResponse)
+	response.ID = pasien.ID
+	response.NoRekamMedis = pasien.NoRekamMedis
+	response.BeratBadan = pasien.BeratBadan
+	response.TinggiBadan = pasien.TinggiBadan
+	response.TekananDarah = pasien.TekananDarah
+	response.DenyutNadi = pasien.DenyutNadi
+	response.HasilLab = pasien.HasilLab
+	response.HasilEkg = pasien.HasilEkg
+	response.TanggalPeriksa = pasien.TanggalPeriksa
+	response.IdAdminPuskesmas = pasien.IdAdminPuskesmas
+	response.IdPengguna = pasien.IdPengguna
 
-	return pasienResponse, nil
+	return response, nil
 }
 
 func (s *PasienService) Create(ctx context.Context, request *model.PasienCreateRequest) error {
@@ -158,20 +158,20 @@ func (s *PasienService) Create(ctx context.Context, request *model.PasienCreateR
 		return fiber.ErrNotFound
 	}
 
-	pasienEntity := new(entity.Pasien)
-	pasienEntity.NoRekamMedis = request.NoRekamMedis
-	pasienEntity.IdPengguna = request.IdPengguna
-	pasienEntity.IdAdminPuskesmas = request.IdAdminPuskesmas
-	pasienEntity.BeratBadan = request.BeratBadan
-	pasienEntity.TinggiBadan = request.TinggiBadan
-	pasienEntity.TekananDarah = request.TekananDarah
-	pasienEntity.DenyutNadi = request.DenyutNadi
-	pasienEntity.HasilLab = request.HasilLab
-	pasienEntity.HasilEkg = request.HasilEkg
-	pasienEntity.TanggalPeriksa = request.TanggalPeriksa
-	pasienEntity.Status = constant.StatusPasienAktif
+	pasien := new(entity.Pasien)
+	pasien.NoRekamMedis = request.NoRekamMedis
+	pasien.IdPengguna = request.IdPengguna
+	pasien.IdAdminPuskesmas = request.IdAdminPuskesmas
+	pasien.BeratBadan = request.BeratBadan
+	pasien.TinggiBadan = request.TinggiBadan
+	pasien.TekananDarah = request.TekananDarah
+	pasien.DenyutNadi = request.DenyutNadi
+	pasien.HasilLab = request.HasilLab
+	pasien.HasilEkg = request.HasilEkg
+	pasien.TanggalPeriksa = request.TanggalPeriksa
+	pasien.Status = constant.StatusPasienAktif
 
-	if err := s.PasienRepository.Create(tx, pasienEntity); err != nil {
+	if err := s.PasienRepository.Create(tx, pasien); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
@@ -255,11 +255,11 @@ func (s *PasienService) Selesai(ctx context.Context, request *model.PasienSelesa
 		log.Println(err.Error())
 		return fiber.ErrNotFound
 	}
-	//cek kontrol balik
+
 	if err := s.KontrolBalikRepository.FindByIdPasienAndStatus(tx, &entity.KontrolBalik{}, request.ID, constant.StatusKontrolBalikMenunggu); err == nil {
 		return fiber.NewError(fiber.StatusConflict, "Pasien masih memiliki kontrol balik yang harus dilakukan")
 	}
-	//cek pengambilan obat
+
 	if err := s.PengambilanObatRepository.FindByIdPasienAndStatus(tx, &entity.PengambilanObat{}, request.ID, constant.StatusKontrolBalikMenunggu); err == nil {
 		return fiber.NewError(fiber.StatusConflict, "Pasien masih memiliki pengambilan obat yang harus dilakukan")
 	}

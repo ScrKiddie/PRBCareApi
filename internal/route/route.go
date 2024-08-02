@@ -22,7 +22,12 @@ type Config struct {
 }
 
 func (c *Config) SetupGuestRoute() {
-	c.App.Use(cors.New())
+	c.App.Use(cors.New(cors.Config{
+		AllowOrigins: c.Config.GetStringSlice("web.cors.origins"),
+		AllowMethods: []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Content-Type", "Authorization"},
+	}))
+
 	c.App.Post("/api/admin-super/login", c.AdminSuperController.Login)
 	c.App.Post("/api/admin-puskesmas/login", c.AdminPuskesmasController.Login)
 	c.App.Post("/api/admin-apotek/login", c.AdminApotekController.Login)

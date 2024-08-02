@@ -43,12 +43,12 @@ func (s *AdminApotekService) List(ctx context.Context) (*[]model.AdminApotekResp
 	}
 
 	var response []model.AdminApotekResponse
-	for _, admin := range *adminApotek {
+	for _, a := range *adminApotek {
 		response = append(response, model.AdminApotekResponse{
-			ID:         admin.ID,
-			NamaApotek: admin.NamaApotek,
-			Telepon:    admin.Telepon,
-			Alamat:     admin.Alamat,
+			ID:         a.ID,
+			NamaApotek: a.NamaApotek,
+			Telepon:    a.Telepon,
+			Alamat:     a.Alamat,
 		})
 	}
 
@@ -80,14 +80,14 @@ func (s *AdminApotekService) Get(ctx context.Context, request *model.AdminApotek
 		return nil, fiber.ErrInternalServerError
 	}
 
-	adminApotekResponse := new(model.AdminApotekResponse)
-	adminApotekResponse.ID = adminApotek.ID
-	adminApotekResponse.Username = adminApotek.Username
-	adminApotekResponse.NamaApotek = adminApotek.NamaApotek
-	adminApotekResponse.Alamat = adminApotek.Alamat
-	adminApotekResponse.Telepon = adminApotek.Telepon
+	response := new(model.AdminApotekResponse)
+	response.ID = adminApotek.ID
+	response.Username = adminApotek.Username
+	response.NamaApotek = adminApotek.NamaApotek
+	response.Alamat = adminApotek.Alamat
+	response.Telepon = adminApotek.Telepon
 
-	return adminApotekResponse, nil
+	return response, nil
 }
 
 func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApotekCreateRequest) error {
@@ -123,14 +123,14 @@ func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApo
 		return fiber.ErrInternalServerError
 	}
 
-	adminApotekEnity := new(entity.AdminApotek)
-	adminApotekEnity.Username = request.Username
-	adminApotekEnity.NamaApotek = request.NamaApotek
-	adminApotekEnity.Alamat = request.Alamat
-	adminApotekEnity.Telepon = request.Telepon
-	adminApotekEnity.Password = string(password)
+	adminApotek := new(entity.AdminApotek)
+	adminApotek.Username = request.Username
+	adminApotek.NamaApotek = request.NamaApotek
+	adminApotek.Alamat = request.Alamat
+	adminApotek.Telepon = request.Telepon
+	adminApotek.Password = string(password)
 
-	if err := s.AdminApotekRepository.Create(tx, adminApotekEnity); err != nil {
+	if err := s.AdminApotekRepository.Create(tx, adminApotek); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
@@ -323,12 +323,12 @@ func (s *AdminApotekService) Current(ctx context.Context, request *model.AdminAp
 		return nil, fiber.ErrInternalServerError
 	}
 
-	adminApotekResponse := new(model.AdminApotekResponse)
-	adminApotekResponse.NamaApotek = adminApotek.NamaApotek
-	adminApotekResponse.Alamat = adminApotek.Alamat
-	adminApotekResponse.Telepon = adminApotek.Telepon
+	response := new(model.AdminApotekResponse)
+	response.NamaApotek = adminApotek.NamaApotek
+	response.Alamat = adminApotek.Alamat
+	response.Telepon = adminApotek.Telepon
 
-	return adminApotekResponse, nil
+	return response, nil
 }
 
 func (s *AdminApotekService) CurrentProfileUpdate(ctx context.Context, request *model.AdminApotekProfileUpdateRequest) error {

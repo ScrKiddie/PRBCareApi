@@ -44,13 +44,13 @@ func (s *PenggunaService) List(ctx context.Context) (*[]model.PenggunaResponse, 
 	}
 
 	var response []model.PenggunaResponse
-	for _, perPengguna := range *pengguna {
+	for _, p := range *pengguna {
 		response = append(response, model.PenggunaResponse{
-			ID:              perPengguna.ID,
-			NamaLengkap:     perPengguna.NamaLengkap,
-			Telepon:         perPengguna.Telepon,
-			TeleponKeluarga: perPengguna.TeleponKeluarga,
-			Alamat:          perPengguna.Alamat,
+			ID:              p.ID,
+			NamaLengkap:     p.NamaLengkap,
+			Telepon:         p.Telepon,
+			TeleponKeluarga: p.TeleponKeluarga,
+			Alamat:          p.Alamat,
 		})
 	}
 
@@ -82,15 +82,15 @@ func (s *PenggunaService) Get(ctx context.Context, request *model.PenggunaGetReq
 		return nil, fiber.ErrInternalServerError
 	}
 
-	penggunaResponse := new(model.PenggunaResponse)
-	penggunaResponse.ID = pengguna.ID
-	penggunaResponse.Username = pengguna.Username
-	penggunaResponse.NamaLengkap = pengguna.NamaLengkap
-	penggunaResponse.Alamat = pengguna.Alamat
-	penggunaResponse.Telepon = pengguna.Telepon
-	penggunaResponse.TeleponKeluarga = pengguna.TeleponKeluarga
+	response := new(model.PenggunaResponse)
+	response.ID = pengguna.ID
+	response.Username = pengguna.Username
+	response.NamaLengkap = pengguna.NamaLengkap
+	response.Alamat = pengguna.Alamat
+	response.Telepon = pengguna.Telepon
+	response.TeleponKeluarga = pengguna.TeleponKeluarga
 
-	return penggunaResponse, nil
+	return response, nil
 }
 
 func (s *PenggunaService) Create(ctx context.Context, request *model.PenggunaCreateRequest) error {
@@ -328,13 +328,13 @@ func (s *PenggunaService) Current(ctx context.Context, request *model.PenggunaGe
 		return nil, fiber.ErrInternalServerError
 	}
 
-	penggunaResponse := new(model.PenggunaResponse)
-	penggunaResponse.NamaLengkap = pengguna.NamaLengkap
-	penggunaResponse.Alamat = pengguna.Alamat
-	penggunaResponse.Telepon = pengguna.Telepon
-	penggunaResponse.TeleponKeluarga = pengguna.TeleponKeluarga
+	response := new(model.PenggunaResponse)
+	response.NamaLengkap = pengguna.NamaLengkap
+	response.Alamat = pengguna.Alamat
+	response.Telepon = pengguna.Telepon
+	response.TeleponKeluarga = pengguna.TeleponKeluarga
 
-	return penggunaResponse, nil
+	return response, nil
 }
 
 func (s *PenggunaService) CurrentProfileUpdate(ctx context.Context, request *model.PenggunaProfileUpdateRequest) error {

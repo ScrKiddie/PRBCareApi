@@ -2,9 +2,6 @@ package config
 
 import (
 	"github.com/go-playground/validator/v10"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"log"
 	"regexp"
 	"strings"

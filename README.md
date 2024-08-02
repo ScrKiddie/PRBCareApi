@@ -1,4 +1,7 @@
 # PRBCareAPI
+<p align="center">
+<img src="https://github.com/user-attachments/assets/50eea6b6-e922-4dda-a036-3fbf1704458d" alt="prbcare" width="400">
+</p>
 
 PRBCareAPI adalah aplikasi REST API untuk manajemen Puskesmas, manajemen Apotek, pengambilan obat, kontrol balik, dan manajemen pasien. Aplikasi ini menyediakan fungsionalitas khusus berdasarkan peran pengguna yang berbeda, termasuk Admin Super, Admin Puskesmas, Admin Apotek, dan Calon Pasien.
 PRBCareAPI dikembangkan dengan mengikuti prinsip-prinsip REST API untuk memastikan skalabilitas dan pemeliharaan yang mudah. Sistem autentikasi dilengkapi untuk memastikan keamanan data.
@@ -23,12 +26,14 @@ PRBCareAPI akan menggunakan environment variables sebagai konfigurasi utama meng
 * **JWT_SECRET**: Secret key untuk JWT.
 * **JWT_EXP**: Waktu kadaluwarsa JWT dalam jam.
 * **WEB_PORT**: Port untuk menjalankan server web.
+* **WEB_CORS_ORIGINS**: Origins yang diizinkan untuk CORS, dipisahkan dengan spasi jika lebih dari satu.
 * **DB_USERNAME**: Nama pengguna database.
 * **DB_PASSWORD**: Kata sandi database.
 * **DB_HOST**: Host database.
 * **DB_PORT**: Port koneksi database.
 * **DB_NAME**: Nama database.
-### Cara Set Environment Variables:
+
+Cara set environment variables:
 - **Windows**: Gunakan System Properties > Advanced > Environment Variables, atau command setx.
 - **Linux/macOS**: Tambahkan export VARIABLE="value" ke file .bashrc atau .profile dan jalankan source ~/.bashrc.
 ## Dokumentasi API
@@ -38,9 +43,9 @@ Untuk mendapatkan lebih detail mengenai endpoint dan cara penggunaan API, kunjun
 [API Documentation](https://bump.sh/sckiddie/doc/prb-care-api)
 
 
-## Contoh Implementasi Frontend
+## Implementasi Frontend
 
-Lihat contoh implementasi frontend untuk aplikasi PRBCareAPI di link berikut:
+Lihat implementasi frontend untuk aplikasi PRBCareAPI di link berikut:
 
 [Frontend Implementation](https://github.com/RyanAprs/PRB-Care-Client.git)
 

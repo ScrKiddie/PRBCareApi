@@ -56,36 +56,36 @@ func (s *KontrolBalikService) Search(ctx context.Context, request *model.Kontrol
 	}
 
 	var response []model.KontrolBalikResponse
-	for _, perKontrolBalik := range *kontrolBalik {
+	for _, k := range *kontrolBalik {
 		response = append(response, model.KontrolBalikResponse{
-			ID: perKontrolBalik.ID,
+			ID: k.ID,
 			PasienResponse: &model.PasienResponse{
-				ID:           perKontrolBalik.Pasien.ID,
-				NoRekamMedis: perKontrolBalik.Pasien.NoRekamMedis,
+				ID:           k.Pasien.ID,
+				NoRekamMedis: k.Pasien.NoRekamMedis,
 				Pengguna: &model.PenggunaResponse{
-					ID:              perKontrolBalik.Pasien.Pengguna.ID,
-					NamaLengkap:     perKontrolBalik.Pasien.Pengguna.NamaLengkap,
-					Telepon:         perKontrolBalik.Pasien.Pengguna.Telepon,
-					TeleponKeluarga: perKontrolBalik.Pasien.Pengguna.TeleponKeluarga,
-					Alamat:          perKontrolBalik.Pasien.Pengguna.Alamat,
+					ID:              k.Pasien.Pengguna.ID,
+					NamaLengkap:     k.Pasien.Pengguna.NamaLengkap,
+					Telepon:         k.Pasien.Pengguna.Telepon,
+					TeleponKeluarga: k.Pasien.Pengguna.TeleponKeluarga,
+					Alamat:          k.Pasien.Pengguna.Alamat,
 				},
 				AdminPuskesmas: &model.AdminPuskesmasResponse{
-					ID:            perKontrolBalik.Pasien.AdminPuskesmas.ID,
-					NamaPuskesmas: perKontrolBalik.Pasien.AdminPuskesmas.NamaPuskesmas,
-					Telepon:       perKontrolBalik.Pasien.AdminPuskesmas.Telepon,
-					Alamat:        perKontrolBalik.Pasien.AdminPuskesmas.Alamat,
+					ID:            k.Pasien.AdminPuskesmas.ID,
+					NamaPuskesmas: k.Pasien.AdminPuskesmas.NamaPuskesmas,
+					Telepon:       k.Pasien.AdminPuskesmas.Telepon,
+					Alamat:        k.Pasien.AdminPuskesmas.Alamat,
 				},
-				BeratBadan:     perKontrolBalik.Pasien.BeratBadan,
-				TinggiBadan:    perKontrolBalik.Pasien.TinggiBadan,
-				TekananDarah:   perKontrolBalik.Pasien.TekananDarah,
-				DenyutNadi:     perKontrolBalik.Pasien.DenyutNadi,
-				HasilLab:       perKontrolBalik.Pasien.HasilLab,
-				HasilEkg:       perKontrolBalik.Pasien.HasilEkg,
-				TanggalPeriksa: perKontrolBalik.Pasien.TanggalPeriksa,
-				Status:         perKontrolBalik.Pasien.Status,
+				BeratBadan:     k.Pasien.BeratBadan,
+				TinggiBadan:    k.Pasien.TinggiBadan,
+				TekananDarah:   k.Pasien.TekananDarah,
+				DenyutNadi:     k.Pasien.DenyutNadi,
+				HasilLab:       k.Pasien.HasilLab,
+				HasilEkg:       k.Pasien.HasilEkg,
+				TanggalPeriksa: k.Pasien.TanggalPeriksa,
+				Status:         k.Pasien.Status,
 			},
-			TanggalKontrol: perKontrolBalik.TanggalKontrol,
-			Status:         perKontrolBalik.Status,
+			TanggalKontrol: k.TanggalKontrol,
+			Status:         k.Status,
 		})
 	}
 
@@ -150,12 +150,12 @@ func (s *KontrolBalikService) Create(ctx context.Context, request *model.Kontrol
 		}
 	}
 
-	kontrolBalikEntity := new(entity.KontrolBalik)
-	kontrolBalikEntity.IdPasien = request.IdPasien
-	kontrolBalikEntity.TanggalKontrol = request.TanggalKontrol
-	kontrolBalikEntity.Status = constant.StatusKontrolBalikMenunggu
+	kontrolBalik := new(entity.KontrolBalik)
+	kontrolBalik.IdPasien = request.IdPasien
+	kontrolBalik.TanggalKontrol = request.TanggalKontrol
+	kontrolBalik.Status = constant.StatusKontrolBalikMenunggu
 
-	if err := s.KontrolBalikRepository.Create(tx, kontrolBalikEntity); err != nil {
+	if err := s.KontrolBalikRepository.Create(tx, kontrolBalik); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
@@ -176,7 +176,7 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// cek harus status menunggu untuk edit
+
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
@@ -189,7 +189,7 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 			return fiber.ErrNotFound
 		}
 	}
-	// cek harus pasien status aktif untuk edit
+
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, &entity.Pasien{}, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
 			log.Println(err.Error())
@@ -261,7 +261,7 @@ func (s *KontrolBalikService) Batal(ctx context.Context, request *model.KontrolB
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// cek harus status menunggu untuk batal
+
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
@@ -298,7 +298,7 @@ func (s *KontrolBalikService) Selesai(ctx context.Context, request *model.Kontro
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// cek harus status menunggu untuk selesai
+
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {

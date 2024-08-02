@@ -4,7 +4,14 @@
     "exp": 24
   },
   "web": {
-    "port": 3000
+    "port": 3000,
+    "cors": {
+      "origins": [
+        "*",
+        "http://example.com",
+        "http://anotherdomain.com"
+      ]
+    }
   },
   "db": {
     "username": "YOUR_DB_USERNAME",

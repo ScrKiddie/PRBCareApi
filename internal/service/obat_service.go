@@ -50,16 +50,16 @@ func (s *ObatService) List(ctx context.Context, request *model.ObatListRequest) 
 	}
 
 	var response []model.ObatResponse
-	for _, perObat := range *obat {
+	for _, o := range *obat {
 		response = append(response, model.ObatResponse{
-			ID:       perObat.ID,
-			NamaObat: perObat.NamaObat,
-			Jumlah:   perObat.Jumlah,
+			ID:       o.ID,
+			NamaObat: o.NamaObat,
+			Jumlah:   o.Jumlah,
 			AdminApotek: &model.AdminApotekResponse{
-				ID:         perObat.AdminApotek.ID,
-				NamaApotek: perObat.AdminApotek.NamaApotek,
-				Telepon:    perObat.AdminApotek.Telepon,
-				Alamat:     perObat.AdminApotek.Alamat,
+				ID:         o.AdminApotek.ID,
+				NamaApotek: o.AdminApotek.NamaApotek,
+				Telepon:    o.AdminApotek.Telepon,
+				Alamat:     o.AdminApotek.Alamat,
 			},
 		})
 	}
@@ -97,13 +97,13 @@ func (s *ObatService) Get(ctx context.Context, request *model.ObatGetRequest) (*
 		return nil, fiber.ErrInternalServerError
 	}
 
-	obatResponse := new(model.ObatResponse)
-	obatResponse.ID = obat.ID
-	obatResponse.NamaObat = obat.NamaObat
-	obatResponse.Jumlah = obat.Jumlah
-	obatResponse.IdAdminApotek = obat.IdAdminApotek
+	response := new(model.ObatResponse)
+	response.ID = obat.ID
+	response.NamaObat = obat.NamaObat
+	response.Jumlah = obat.Jumlah
+	response.IdAdminApotek = obat.IdAdminApotek
 
-	return obatResponse, nil
+	return response, nil
 }
 
 func (s *ObatService) Create(ctx context.Context, request *model.ObatCreateRequest) error {

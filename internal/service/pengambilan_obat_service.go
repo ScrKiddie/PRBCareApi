@@ -64,49 +64,49 @@ func (s *PengambilanObatService) Search(ctx context.Context, request *model.Peng
 	}
 
 	var response []model.PengambilanObatResponse
-	for _, perPengambilanObat := range *pengambilanObat {
+	for _, p := range *pengambilanObat {
 		response = append(response, model.PengambilanObatResponse{
-			ID:   perPengambilanObat.ID,
-			Resi: perPengambilanObat.Resi,
+			ID:   p.ID,
+			Resi: p.Resi,
 			PasienResponse: &model.PasienResponse{
-				ID:           perPengambilanObat.Pasien.ID,
-				NoRekamMedis: perPengambilanObat.Pasien.NoRekamMedis,
+				ID:           p.Pasien.ID,
+				NoRekamMedis: p.Pasien.NoRekamMedis,
 				Pengguna: &model.PenggunaResponse{
-					ID:              perPengambilanObat.Pasien.Pengguna.ID,
-					NamaLengkap:     perPengambilanObat.Pasien.Pengguna.NamaLengkap,
-					Telepon:         perPengambilanObat.Pasien.Pengguna.Telepon,
-					TeleponKeluarga: perPengambilanObat.Pasien.Pengguna.TeleponKeluarga,
-					Alamat:          perPengambilanObat.Pasien.Pengguna.Alamat,
+					ID:              p.Pasien.Pengguna.ID,
+					NamaLengkap:     p.Pasien.Pengguna.NamaLengkap,
+					Telepon:         p.Pasien.Pengguna.Telepon,
+					TeleponKeluarga: p.Pasien.Pengguna.TeleponKeluarga,
+					Alamat:          p.Pasien.Pengguna.Alamat,
 				},
 				AdminPuskesmas: &model.AdminPuskesmasResponse{
-					ID:            perPengambilanObat.Pasien.AdminPuskesmas.ID,
-					NamaPuskesmas: perPengambilanObat.Pasien.AdminPuskesmas.NamaPuskesmas,
-					Telepon:       perPengambilanObat.Pasien.AdminPuskesmas.Telepon,
-					Alamat:        perPengambilanObat.Pasien.AdminPuskesmas.Alamat,
+					ID:            p.Pasien.AdminPuskesmas.ID,
+					NamaPuskesmas: p.Pasien.AdminPuskesmas.NamaPuskesmas,
+					Telepon:       p.Pasien.AdminPuskesmas.Telepon,
+					Alamat:        p.Pasien.AdminPuskesmas.Alamat,
 				},
-				BeratBadan:     perPengambilanObat.Pasien.BeratBadan,
-				TinggiBadan:    perPengambilanObat.Pasien.TinggiBadan,
-				TekananDarah:   perPengambilanObat.Pasien.TekananDarah,
-				DenyutNadi:     perPengambilanObat.Pasien.DenyutNadi,
-				HasilLab:       perPengambilanObat.Pasien.HasilLab,
-				HasilEkg:       perPengambilanObat.Pasien.HasilEkg,
-				TanggalPeriksa: perPengambilanObat.Pasien.TanggalPeriksa,
-				Status:         perPengambilanObat.Pasien.Status,
+				BeratBadan:     p.Pasien.BeratBadan,
+				TinggiBadan:    p.Pasien.TinggiBadan,
+				TekananDarah:   p.Pasien.TekananDarah,
+				DenyutNadi:     p.Pasien.DenyutNadi,
+				HasilLab:       p.Pasien.HasilLab,
+				HasilEkg:       p.Pasien.HasilEkg,
+				TanggalPeriksa: p.Pasien.TanggalPeriksa,
+				Status:         p.Pasien.Status,
 			},
 			Obat: &model.ObatResponse{
-				ID:       perPengambilanObat.Obat.ID,
-				NamaObat: perPengambilanObat.Obat.NamaObat,
-				Jumlah:   perPengambilanObat.Obat.Jumlah,
+				ID:       p.Obat.ID,
+				NamaObat: p.Obat.NamaObat,
+				Jumlah:   p.Obat.Jumlah,
 				AdminApotek: &model.AdminApotekResponse{
-					ID:         perPengambilanObat.Obat.AdminApotek.ID,
-					NamaApotek: perPengambilanObat.Obat.AdminApotek.NamaApotek,
-					Telepon:    perPengambilanObat.Obat.AdminApotek.Telepon,
-					Alamat:     perPengambilanObat.Obat.AdminApotek.Alamat,
+					ID:         p.Obat.AdminApotek.ID,
+					NamaApotek: p.Obat.AdminApotek.NamaApotek,
+					Telepon:    p.Obat.AdminApotek.Telepon,
+					Alamat:     p.Obat.AdminApotek.Alamat,
 				},
 			},
-			Jumlah:             perPengambilanObat.Jumlah,
-			TanggalPengambilan: perPengambilanObat.TanggalPengambilan,
-			Status:             perPengambilanObat.Status,
+			Jumlah:             p.Jumlah,
+			TanggalPengambilan: p.TanggalPengambilan,
+			Status:             p.Status,
 		})
 	}
 
@@ -183,20 +183,20 @@ func (s *PengambilanObatService) Create(ctx context.Context, request *model.Peng
 		return fiber.NewError(fiber.StatusConflict, "Jumlah obat melebihi persediaan apotek")
 	}
 
-	pengambilanObatEntity := new(entity.PengambilanObat)
-	pengambilanObatEntity.Resi = fmt.Sprintf("%d%d", request.IdPasien, request.TanggalPengambilan)
-	pengambilanObatEntity.IdPasien = request.IdPasien
-	pengambilanObatEntity.IdObat = request.IdObat
-	pengambilanObatEntity.Jumlah = request.Jumlah
-	pengambilanObatEntity.TanggalPengambilan = request.TanggalPengambilan
-	pengambilanObatEntity.Status = constant.StatusPengambilanObatMenunggu
+	pengambilanObat := new(entity.PengambilanObat)
+	pengambilanObat.Resi = fmt.Sprintf("%d%d", request.IdPasien, request.TanggalPengambilan)
+	pengambilanObat.IdPasien = request.IdPasien
+	pengambilanObat.IdObat = request.IdObat
+	pengambilanObat.Jumlah = request.Jumlah
+	pengambilanObat.TanggalPengambilan = request.TanggalPengambilan
+	pengambilanObat.Status = constant.StatusPengambilanObatMenunggu
 
 	if err := s.ObatRepository.Update(tx, obat); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
-	if err := s.PengambilanObatRepository.Create(tx, pengambilanObatEntity); err != nil {
+	if err := s.PengambilanObatRepository.Create(tx, pengambilanObat); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
@@ -217,7 +217,7 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// harus status menunggu
+
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatMenunggu); err != nil {
@@ -230,7 +230,7 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 			return fiber.ErrNotFound
 		}
 	}
-	// harus pasien status aktif
+
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, &entity.Pasien{}, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
 			log.Println(err.Error())
@@ -303,7 +303,7 @@ func (s *PengambilanObatService) Delete(ctx context.Context, request *model.Peng
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// harus status batal atau diambil
+
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatusOrStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatBatal, constant.StatusPengambilanObatDiambil); err != nil {
@@ -338,7 +338,7 @@ func (s *PengambilanObatService) Batal(ctx context.Context, request *model.Penga
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// harus status menunggu
+
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatMenunggu); err != nil {
@@ -386,7 +386,7 @@ func (s *PengambilanObatService) Diambil(ctx context.Context, request *model.Pen
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
-	// harus status menunggu
+
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminApotek > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminApotekAndStatus(tx, pengambilanObat, request.ID, request.IdAdminApotek, constant.StatusPengambilanObatMenunggu); err != nil {
