@@ -45,10 +45,11 @@ func (s *AdminApotekService) List(ctx context.Context) (*[]model.AdminApotekResp
 	var response []model.AdminApotekResponse
 	for _, a := range *adminApotek {
 		response = append(response, model.AdminApotekResponse{
-			ID:         a.ID,
-			NamaApotek: a.NamaApotek,
-			Telepon:    a.Telepon,
-			Alamat:     a.Alamat,
+			ID:               a.ID,
+			NamaApotek:       a.NamaApotek,
+			Telepon:          a.Telepon,
+			Alamat:           a.Alamat,
+			WaktuOperasional: a.WaktuOperasional,
 		})
 	}
 
@@ -86,6 +87,7 @@ func (s *AdminApotekService) Get(ctx context.Context, request *model.AdminApotek
 	response.NamaApotek = adminApotek.NamaApotek
 	response.Alamat = adminApotek.Alamat
 	response.Telepon = adminApotek.Telepon
+	response.WaktuOperasional = adminApotek.WaktuOperasional
 
 	return response, nil
 }
@@ -127,6 +129,7 @@ func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApo
 	adminApotek.Username = request.Username
 	adminApotek.NamaApotek = request.NamaApotek
 	adminApotek.Alamat = request.Alamat
+	adminApotek.WaktuOperasional = request.WaktuOperasional
 	adminApotek.Telepon = request.Telepon
 	adminApotek.Password = string(password)
 
@@ -188,6 +191,7 @@ func (s *AdminApotekService) Update(ctx context.Context, request *model.AdminApo
 	adminApotek.Username = request.Username
 	adminApotek.NamaApotek = request.NamaApotek
 	adminApotek.Alamat = request.Alamat
+	adminApotek.WaktuOperasional = request.WaktuOperasional
 	adminApotek.Telepon = request.Telepon
 	if string(password) != "" {
 		adminApotek.Password = string(password)
@@ -326,6 +330,7 @@ func (s *AdminApotekService) Current(ctx context.Context, request *model.AdminAp
 	response := new(model.AdminApotekResponse)
 	response.NamaApotek = adminApotek.NamaApotek
 	response.Alamat = adminApotek.Alamat
+	response.WaktuOperasional = adminApotek.WaktuOperasional
 	response.Telepon = adminApotek.Telepon
 
 	return response, nil
@@ -357,6 +362,7 @@ func (s *AdminApotekService) CurrentProfileUpdate(ctx context.Context, request *
 
 	adminApotek.NamaApotek = request.NamaApotek
 	adminApotek.Alamat = request.Alamat
+	adminApotek.WaktuOperasional = request.WaktuOperasional
 	adminApotek.Telepon = request.Telepon
 
 	if err := s.AdminApotekRepository.Update(tx, adminApotek); err != nil {

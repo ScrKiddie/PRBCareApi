@@ -64,16 +64,10 @@ func (s *PasienService) Search(ctx context.Context, request *model.PasienSearchR
 	var response []model.PasienResponse
 	for _, p := range *pasien {
 		response = append(response, model.PasienResponse{
-			ID:             p.ID,
-			NoRekamMedis:   p.NoRekamMedis,
-			BeratBadan:     p.BeratBadan,
-			TinggiBadan:    p.TinggiBadan,
-			TekananDarah:   p.TekananDarah,
-			DenyutNadi:     p.DenyutNadi,
-			HasilLab:       p.HasilLab,
-			HasilEkg:       p.HasilEkg,
-			TanggalPeriksa: p.TanggalPeriksa,
-			Status:         p.Status,
+			ID:            p.ID,
+			NoRekamMedis:  p.NoRekamMedis,
+			TanggalDaftar: p.TanggalDaftar,
+			Status:        p.Status,
 			Pengguna: &model.PenggunaResponse{
 				ID:              p.Pengguna.ID,
 				NamaLengkap:     p.Pengguna.NamaLengkap,
@@ -82,10 +76,11 @@ func (s *PasienService) Search(ctx context.Context, request *model.PasienSearchR
 				Alamat:          p.Pengguna.Alamat,
 			},
 			AdminPuskesmas: &model.AdminPuskesmasResponse{
-				ID:            p.AdminPuskesmas.ID,
-				NamaPuskesmas: p.AdminPuskesmas.NamaPuskesmas,
-				Telepon:       p.AdminPuskesmas.Telepon,
-				Alamat:        p.AdminPuskesmas.Alamat,
+				ID:               p.AdminPuskesmas.ID,
+				NamaPuskesmas:    p.AdminPuskesmas.NamaPuskesmas,
+				Telepon:          p.AdminPuskesmas.Telepon,
+				Alamat:           p.AdminPuskesmas.Alamat,
+				WaktuOperasional: p.AdminPuskesmas.WaktuOperasional,
 			},
 		})
 	}
@@ -126,13 +121,7 @@ func (s *PasienService) Get(ctx context.Context, request *model.PasienGetRequest
 	response := new(model.PasienResponse)
 	response.ID = pasien.ID
 	response.NoRekamMedis = pasien.NoRekamMedis
-	response.BeratBadan = pasien.BeratBadan
-	response.TinggiBadan = pasien.TinggiBadan
-	response.TekananDarah = pasien.TekananDarah
-	response.DenyutNadi = pasien.DenyutNadi
-	response.HasilLab = pasien.HasilLab
-	response.HasilEkg = pasien.HasilEkg
-	response.TanggalPeriksa = pasien.TanggalPeriksa
+	response.TanggalDaftar = pasien.TanggalDaftar
 	response.IdAdminPuskesmas = pasien.IdAdminPuskesmas
 	response.IdPengguna = pasien.IdPengguna
 
@@ -162,13 +151,7 @@ func (s *PasienService) Create(ctx context.Context, request *model.PasienCreateR
 	pasien.NoRekamMedis = request.NoRekamMedis
 	pasien.IdPengguna = request.IdPengguna
 	pasien.IdAdminPuskesmas = request.IdAdminPuskesmas
-	pasien.BeratBadan = request.BeratBadan
-	pasien.TinggiBadan = request.TinggiBadan
-	pasien.TekananDarah = request.TekananDarah
-	pasien.DenyutNadi = request.DenyutNadi
-	pasien.HasilLab = request.HasilLab
-	pasien.HasilEkg = request.HasilEkg
-	pasien.TanggalPeriksa = request.TanggalPeriksa
+	pasien.TanggalDaftar = request.TanggalDaftar
 	pasien.Status = constant.StatusPasienAktif
 
 	if err := s.PasienRepository.Create(tx, pasien); err != nil {
@@ -216,13 +199,7 @@ func (s *PasienService) Update(ctx context.Context, request *model.PasienUpdateR
 	pasien.NoRekamMedis = request.NoRekamMedis
 	pasien.IdPengguna = request.IdPengguna
 	pasien.IdAdminPuskesmas = request.IdAdminPuskesmas
-	pasien.BeratBadan = request.BeratBadan
-	pasien.TinggiBadan = request.TinggiBadan
-	pasien.TekananDarah = request.TekananDarah
-	pasien.DenyutNadi = request.DenyutNadi
-	pasien.HasilLab = request.HasilLab
-	pasien.HasilEkg = request.HasilEkg
-	pasien.TanggalPeriksa = request.TanggalPeriksa
+	pasien.TanggalDaftar = request.TanggalDaftar
 
 	if err := s.PasienRepository.Update(tx, pasien); err != nil {
 		log.Println(err.Error())

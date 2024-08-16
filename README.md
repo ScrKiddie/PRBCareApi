@@ -23,15 +23,20 @@ PRBCareAPI dikembangkan dengan mengikuti prinsip-prinsip REST API untuk memastik
 
 ## Environment Variables
 PRBCareAPI akan menggunakan environment variables sebagai konfigurasi utama menggantikan `config.json` jika variabel-variabel tersebut diset sebelum menjalankan proyek:
-* **JWT_SECRET**: Secret key untuk JWT.
-* **JWT_EXP**: Waktu kadaluwarsa JWT dalam jam.
-* **WEB_PORT**: Port untuk menjalankan server web.
-* **WEB_CORS_ORIGINS**: Origins yang diizinkan untuk CORS, dipisahkan dengan spasi jika lebih dari satu.
-* **DB_USERNAME**: Nama pengguna database.
-* **DB_PASSWORD**: Kata sandi database.
-* **DB_HOST**: Host database.
-* **DB_PORT**: Port koneksi database.
-* **DB_NAME**: Nama database.
+
+| Key                  | Type    | Deskripsi                                                                 | Contoh                                                       |
+|----------------------|---------|---------------------------------------------------------------------------|--------------------------------------------------------------|
+| **JWT_SECRET**       | `string`| Secret key untuk JWT.                                                     | `mysecretkey123`                                             |
+| **JWT_EXP**          | `int`   | Waktu kadaluwarsa JWT dalam jam.                                          | `24`                                                         |
+| **WEB_PORT**         | `int`   | Port untuk menjalankan server web.                                        | `8080`                                                       |
+| **WEB_CORS_ORIGINS** | `string`| Origins yang diizinkan untuk CORS, dipisahkan dengan spasi jika lebih dari satu. | `http://localhost http://example.com`                          |
+| **DB_USERNAME**      | `string`| Nama pengguna database.                                                   | `root`                                                       |
+| **DB_PASSWORD**      | `string`| Kata sandi database.                                                      | `password123`                                                |
+| **DB_HOST**          | `string`| Host database.                                                            | `localhost`                                                  |
+| **DB_PORT**          | `int`   | Port koneksi database.                                                    | `3306`                                                       |
+| **DB_NAME**          | `string`| Nama database.                                                            | `prbcare`                                                    |
+
+
 
 Cara set environment variables:
 - **Windows**: Gunakan System Properties > Advanced > Environment Variables, atau command setx.
@@ -40,7 +45,7 @@ Cara set environment variables:
 
 Untuk mendapatkan lebih detail mengenai endpoint dan cara penggunaan API, kunjungi dokumentasi API di link berikut:
 
-[API Documentation](https://bump.sh/sckiddie/doc/prb-care-api)
+[API Documentation](https://app.swaggerhub.com/apis-docs/restfullapi/PRB-Care-API/1.0.0)
 
 
 ## Implementasi Frontend

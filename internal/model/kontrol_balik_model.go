@@ -2,9 +2,18 @@ package model
 
 type KontrolBalikResponse struct {
 	ID             int32           `json:"id"`
+	NoAntrean      int32           `json:"noAntrean"`
 	IdPasien       int32           `json:"idPasien,omitempty"`
 	PasienResponse *PasienResponse `json:"pasien,omitempty"`
+	BeratBadan     int32           `json:"beratBadan"`
+	TinggiBadan    int32           `json:"tinggiBadan"`
+	TekananDarah   string          `json:"tekananDarah"`
+	DenyutNadi     int32           `json:"denyutNadi"`
+	HasilLab       string          `json:"hasilLab"`
+	HasilEkg       string          `json:"hasilEkg"`
 	TanggalKontrol int64           `json:"tanggalKontrol"`
+	HasilDiagnosa  string          `json:"hasilDiagnosa"`
+	Keluhan        string          `json:"keluhan"`
 	Status         string          `json:"status,omitempty"`
 }
 
@@ -23,10 +32,19 @@ type KontrolBalikCreateRequest struct {
 	IdAdminPuskesmas int32 `validate:"omitempty,numeric"`
 }
 type KontrolBalikUpdateRequest struct {
-	ID               int32 `json:"id" validate:"required,numeric"`
-	IdPasien         int32 `json:"idPasien" validate:"required,numeric"`
-	TanggalKontrol   int64 `json:"tanggalKontrol" validate:"required,numeric"`
-	IdAdminPuskesmas int32 `validate:"omitempty,numeric"`
+	ID               int32  `json:"id" validate:"required,numeric"`
+	NoAntrean        int32  `json:"noAntrean" validate:"required,numeric,gt=0"`
+	IdPasien         int32  `json:"idPasien" validate:"required,numeric"`
+	TanggalKontrol   int64  `json:"tanggalKontrol" validate:"required,numeric"`
+	IdAdminPuskesmas int32  `validate:"omitempty,numeric"`
+	BeratBadan       int32  `json:"beratBadan" validate:"numeric,gte=0"`
+	TinggiBadan      int32  `json:"tinggiBadan" validate:"numeric,gte=0"`
+	TekananDarah     string `json:"tekananDarah" mod:"normalize_spaces" validate:"max=20"`
+	DenyutNadi       int32  `json:"denyutNadi" validate:"numeric,gte=0"`
+	HasilLab         string `json:"hasilLab" mod:"normalize_spaces"`
+	HasilEkg         string `json:"hasilEkg" mod:"normalize_spaces"`
+	HasilDiagnosa    string `json:"hasilDiagnosa" mod:"normalize_spaces"`
+	Keluhan          string `json:"keluhan" mod:"normalize_spaces"`
 }
 type KontrolBalikDeleteRequest struct {
 	ID               int32 `json:"id" validate:"required,numeric"`

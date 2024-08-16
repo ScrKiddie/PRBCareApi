@@ -56,10 +56,11 @@ func (s *ObatService) List(ctx context.Context, request *model.ObatListRequest) 
 			NamaObat: o.NamaObat,
 			Jumlah:   o.Jumlah,
 			AdminApotek: &model.AdminApotekResponse{
-				ID:         o.AdminApotek.ID,
-				NamaApotek: o.AdminApotek.NamaApotek,
-				Telepon:    o.AdminApotek.Telepon,
-				Alamat:     o.AdminApotek.Alamat,
+				ID:               o.AdminApotek.ID,
+				NamaApotek:       o.AdminApotek.NamaApotek,
+				Telepon:          o.AdminApotek.Telepon,
+				Alamat:           o.AdminApotek.Alamat,
+				WaktuOperasional: o.AdminApotek.WaktuOperasional,
 			},
 		})
 	}

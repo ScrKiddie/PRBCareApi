@@ -58,7 +58,8 @@ func (s *KontrolBalikService) Search(ctx context.Context, request *model.Kontrol
 	var response []model.KontrolBalikResponse
 	for _, k := range *kontrolBalik {
 		response = append(response, model.KontrolBalikResponse{
-			ID: k.ID,
+			ID:        k.ID,
+			NoAntrean: k.NoAntrean,
 			PasienResponse: &model.PasienResponse{
 				ID:           k.Pasien.ID,
 				NoRekamMedis: k.Pasien.NoRekamMedis,
@@ -70,20 +71,23 @@ func (s *KontrolBalikService) Search(ctx context.Context, request *model.Kontrol
 					Alamat:          k.Pasien.Pengguna.Alamat,
 				},
 				AdminPuskesmas: &model.AdminPuskesmasResponse{
-					ID:            k.Pasien.AdminPuskesmas.ID,
-					NamaPuskesmas: k.Pasien.AdminPuskesmas.NamaPuskesmas,
-					Telepon:       k.Pasien.AdminPuskesmas.Telepon,
-					Alamat:        k.Pasien.AdminPuskesmas.Alamat,
+					ID:               k.Pasien.AdminPuskesmas.ID,
+					NamaPuskesmas:    k.Pasien.AdminPuskesmas.NamaPuskesmas,
+					Telepon:          k.Pasien.AdminPuskesmas.Telepon,
+					Alamat:           k.Pasien.AdminPuskesmas.Alamat,
+					WaktuOperasional: k.Pasien.AdminPuskesmas.WaktuOperasional,
 				},
-				BeratBadan:     k.Pasien.BeratBadan,
-				TinggiBadan:    k.Pasien.TinggiBadan,
-				TekananDarah:   k.Pasien.TekananDarah,
-				DenyutNadi:     k.Pasien.DenyutNadi,
-				HasilLab:       k.Pasien.HasilLab,
-				HasilEkg:       k.Pasien.HasilEkg,
-				TanggalPeriksa: k.Pasien.TanggalPeriksa,
-				Status:         k.Pasien.Status,
+				TanggalDaftar: k.Pasien.TanggalDaftar,
+				Status:        k.Pasien.Status,
 			},
+			Keluhan:        k.Keluhan,
+			BeratBadan:     k.BeratBadan,
+			TinggiBadan:    k.TinggiBadan,
+			TekananDarah:   k.TekananDarah,
+			DenyutNadi:     k.DenyutNadi,
+			HasilLab:       k.HasilLab,
+			HasilEkg:       k.HasilEkg,
+			HasilDiagnosa:  k.HasilDiagnosa,
 			TanggalKontrol: k.TanggalKontrol,
 			Status:         k.Status,
 		})
@@ -124,6 +128,15 @@ func (s *KontrolBalikService) Get(ctx context.Context, request *model.KontrolBal
 
 	response := new(model.KontrolBalikResponse)
 	response.ID = kontrolBalik.ID
+	response.NoAntrean = kontrolBalik.NoAntrean
+	response.Keluhan = kontrolBalik.Keluhan
+	response.BeratBadan = kontrolBalik.BeratBadan
+	response.TinggiBadan = kontrolBalik.TinggiBadan
+	response.TekananDarah = kontrolBalik.TekananDarah
+	response.DenyutNadi = kontrolBalik.DenyutNadi
+	response.HasilLab = kontrolBalik.HasilLab
+	response.HasilEkg = kontrolBalik.HasilEkg
+	response.HasilDiagnosa = kontrolBalik.HasilDiagnosa
 	response.TanggalKontrol = kontrolBalik.TanggalKontrol
 	response.IdPasien = kontrolBalik.IdPasien
 	return response, nil
@@ -150,8 +163,15 @@ func (s *KontrolBalikService) Create(ctx context.Context, request *model.Kontrol
 		}
 	}
 
+	noAntrean, err := s.KontrolBalikRepository.FindMaksNoAntreanByTanggalKontrol(tx, request.TanggalKontrol)
+	if err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+
 	kontrolBalik := new(entity.KontrolBalik)
 	kontrolBalik.IdPasien = request.IdPasien
+	kontrolBalik.NoAntrean = noAntrean + 1
 	kontrolBalik.TanggalKontrol = request.TanggalKontrol
 	kontrolBalik.Status = constant.StatusKontrolBalikMenunggu
 
@@ -202,7 +222,25 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 		}
 	}
 
+	total, err := s.KontrolBalikRepository.CountByNoAntreanAndTanggalKontrol(tx, request.NoAntrean, request.TanggalKontrol)
+	if err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+	if total > 0 {
+		return fiber.NewError(fiber.StatusConflict, "Nomor antrean pada tanggal tersebut sudah digunakan")
+	}
+
 	kontrolBalik.IdPasien = request.IdPasien
+	kontrolBalik.NoAntrean = request.NoAntrean
+	kontrolBalik.Keluhan = request.Keluhan
+	kontrolBalik.BeratBadan = request.BeratBadan
+	kontrolBalik.TinggiBadan = request.TinggiBadan
+	kontrolBalik.TekananDarah = request.TekananDarah
+	kontrolBalik.DenyutNadi = request.DenyutNadi
+	kontrolBalik.HasilLab = request.HasilLab
+	kontrolBalik.HasilEkg = request.HasilEkg
+	kontrolBalik.HasilDiagnosa = request.HasilDiagnosa
 	kontrolBalik.TanggalKontrol = request.TanggalKontrol
 
 	if err := s.KontrolBalikRepository.Update(tx, kontrolBalik); err != nil {

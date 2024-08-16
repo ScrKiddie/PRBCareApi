@@ -45,10 +45,11 @@ func (s *AdminPuskesmasService) List(ctx context.Context) (*[]model.AdminPuskesm
 	var response []model.AdminPuskesmasResponse
 	for _, a := range *adminPuskesmas {
 		response = append(response, model.AdminPuskesmasResponse{
-			ID:            a.ID,
-			NamaPuskesmas: a.NamaPuskesmas,
-			Telepon:       a.Telepon,
-			Alamat:        a.Alamat,
+			ID:               a.ID,
+			NamaPuskesmas:    a.NamaPuskesmas,
+			Telepon:          a.Telepon,
+			Alamat:           a.Alamat,
+			WaktuOperasional: a.WaktuOperasional,
 		})
 	}
 
@@ -85,6 +86,7 @@ func (s *AdminPuskesmasService) Get(ctx context.Context, request *model.AdminPus
 	response.Username = adminPuskesmas.Username
 	response.NamaPuskesmas = adminPuskesmas.NamaPuskesmas
 	response.Alamat = adminPuskesmas.Alamat
+	response.WaktuOperasional = adminPuskesmas.WaktuOperasional
 	response.Telepon = adminPuskesmas.Telepon
 
 	return response, nil
@@ -127,6 +129,7 @@ func (s *AdminPuskesmasService) Create(ctx context.Context, request *model.Admin
 	adminPuskesmasEnity.Username = request.Username
 	adminPuskesmasEnity.NamaPuskesmas = request.NamaPuskesmas
 	adminPuskesmasEnity.Alamat = request.Alamat
+	adminPuskesmasEnity.WaktuOperasional = request.WaktuOperasional
 	adminPuskesmasEnity.Telepon = request.Telepon
 	adminPuskesmasEnity.Password = string(password)
 
@@ -188,6 +191,7 @@ func (s *AdminPuskesmasService) Update(ctx context.Context, request *model.Admin
 	adminPuskesmas.Username = request.Username
 	adminPuskesmas.NamaPuskesmas = request.NamaPuskesmas
 	adminPuskesmas.Alamat = request.Alamat
+	adminPuskesmas.WaktuOperasional = request.WaktuOperasional
 	adminPuskesmas.Telepon = request.Telepon
 	if string(password) != "" {
 		adminPuskesmas.Password = string(password)
@@ -326,6 +330,7 @@ func (s *AdminPuskesmasService) Current(ctx context.Context, request *model.Admi
 	response := new(model.AdminPuskesmasResponse)
 	response.NamaPuskesmas = adminPuskesmas.NamaPuskesmas
 	response.Alamat = adminPuskesmas.Alamat
+	response.WaktuOperasional = adminPuskesmas.WaktuOperasional
 	response.Telepon = adminPuskesmas.Telepon
 
 	return response, nil
@@ -357,6 +362,7 @@ func (s *AdminPuskesmasService) CurrentProfileUpdate(ctx context.Context, reques
 
 	adminPuskesmas.NamaPuskesmas = request.NamaPuskesmas
 	adminPuskesmas.Alamat = request.Alamat
+	adminPuskesmas.WaktuOperasional = request.WaktuOperasional
 	adminPuskesmas.Telepon = request.Telepon
 
 	if err := s.AdminPuskesmasRepository.Update(tx, adminPuskesmas); err != nil {

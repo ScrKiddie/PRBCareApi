@@ -4,10 +4,148 @@ info:
   version: 1.0.0
 components:
   securitySchemes:
-    jwtAuth:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  schemas:
+    login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    password:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+        confirmPassword:
+          type: string
+      required:
+        - currentPassword
+        - newPassword
+        - confirmPassword
+
+    get_puskesmas:
+      type: object
+      properties:
+        id:
+          type: integer
+        namaPuskesmas:
+          type: string
+        username:
+          type: string
+        telepon:
+          type: string
+        alamat:
+          type: string
+        waktuOperasional:
+          type: string
+    get_apotek:
+      type: object
+      properties:
+        id:
+          type: integer
+        namaApotek:
+          type: string
+        telepon:
+          type: string
+        alamat:
+          type: string
+        waktuOperasional:
+          type: string
+    get_pengguna:
+      type: object
+      properties:
+        id:
+          type: integer
+        namaLengkap:
+          type: string
+        telepon:
+          type: string
+        teleponKeluarga:
+          type: string
+        alamat:
+          type: string
+        username:
+          type: string
+
+    get_pasien:
+      type: object
+      properties:
+        id:
+          type: integer
+        noRekamMedis:
+          type: string
+        adminPuskesmas:
+          $ref: '#/components/schemas/get_puskesmas'
+        pengguna:
+          $ref: '#/components/schemas/get_pengguna'
+        tanggalDaftar:
+          type: integer
+        status:
+          type: string
+
+  responses:
+    BadRequestError:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Bad request
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Internal server error
+    NotFoundError:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not found
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+
 tags:
   - name: Admin Super
     description: Operasi yang berhubungan dengan admin super
@@ -37,15 +175,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/login'
       responses:
         '200':
           description: Login successful
@@ -68,49 +198,22 @@ paths:
                     type: string
                     example: Username atau password salah
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-super/current/password:
     patch:
       tags:
         - Admin Super
       summary: Update super admin password
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                currentPassword:
-                  type: string
-                newPassword:
-                  type: string
-                confirmPassword:
-                  type: string
-              required:
-                - currentPassword
-                - newPassword
-                - confirmPassword
+              $ref: '#/components/schemas/password'
       responses:
         '200':
           description: Password berhasil diganti
@@ -123,15 +226,7 @@ paths:
                     type: string
                     example: Password berhasil diganti
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
           description: Unauthorized
           content:
@@ -143,25 +238,9 @@ paths:
                     type: string
                     example: Password saat ini salah
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
   /api/admin-puskesmas/login:
     post:
@@ -173,15 +252,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/login'
       responses:
         '200':
           description: Login successful
@@ -204,25 +275,9 @@ paths:
                     type: string
                     example: Username atau password salah
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
   /api/admin-puskesmas/current:
     get:
@@ -230,7 +285,7 @@ paths:
         - Admin Puskesmas
       summary: Get current admin puskesmas
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -239,6 +294,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  waktuOperasional:
+                    type: string
                   namaPuskesmas:
                     type: string
                   telepon:
@@ -246,31 +303,15 @@ paths:
                   alamat:
                     type: string
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Admin Puskesmas
       summary: Update current admin puskesmas
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -278,6 +319,8 @@ paths:
             schema:
               type: object
               properties:
+                waktuOperasional:
+                  type: string
                 namaPuskesmas:
                   type: string
                 telepon:
@@ -286,6 +329,7 @@ paths:
                   type: string
               required:
                 - namaPuskesmas
+                - waktuOperasional
                 - telepon
                 - alamat
       responses:
@@ -310,69 +354,26 @@ paths:
                     type: string
                     example: Nomor hp sudah digunakan
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-puskesmas/current/password:
     patch:
       tags:
         - Admin Puskesmas
       summary: Update admin puskesmas password
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                currentPassword:
-                  type: string
-                newPassword:
-                  type: string
-                confirmPassword:
-                  type: string
-              required:
-                - confirmPassword
-                - currentPassword
-                - newPassword
+              $ref: '#/components/schemas/password'
       responses:
         '200':
           description: Password berhasil diganti
@@ -385,15 +386,7 @@ paths:
                     type: string
                     example: Password berhasil diganti
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
           description: Password saat ini salah
           content:
@@ -405,32 +398,16 @@ paths:
                     type: string
                     example: Password saat ini salah
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-puskesmas:
     get:
       tags:
         - Admin Puskesmas
       summary: Get all admin puskesmas
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -442,42 +419,17 @@ paths:
                   data:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        namaPuskesmas:
-                          type: string
-                        telepon:
-                          type: string
-                        alamat:
-                          type: string
+                      $ref: '#/components/schemas/get_puskesmas'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Admin Puskesmas
       summary: Create new admin puskesmas
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -485,6 +437,8 @@ paths:
             schema:
               type: object
               properties:
+                waktuOperasional:
+                  type: string
                 namaPuskesmas:
                   type: string
                 username:
@@ -499,6 +453,7 @@ paths:
                 - telepon
                 - alamat
                 - namaPuskesmas
+                - waktuOperasional
                 - username
                 - password
       responses:
@@ -513,25 +468,9 @@ paths:
                     type: string
                     example: Admin puskesmas berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '409':
           description: Username atau No HP sudah digunakan
           content:
@@ -549,22 +488,14 @@ paths:
                   value:
                     error: Nomor hp sudah digunakan
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-puskesmas/{id}:
     get:
       tags:
         - Admin Puskesmas
       summary: Get admin puskesmas by id
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -580,54 +511,19 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      namaPuskesmas:
-                        type: string
-                      username:
-                        type: string
-                      telepon:
-                        type: string
-                      alamat:
-                        type: string
+                    $ref: '#/components/schemas/get_puskesmas'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Admin Puskesmas
       summary: Update admin puskesmas
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -641,6 +537,8 @@ paths:
             schema:
               type: object
               properties:
+                waktuOperasional:
+                  type: string
                 namaPuskesmas:
                   type: string
                 username:
@@ -656,6 +554,7 @@ paths:
                 - alamat
                 - telepon
                 - namaPuskesmas
+                - waktuOperasional
                 - username
       responses:
         '200':
@@ -669,25 +568,9 @@ paths:
                     type: string
                     example: Admin puskesmas berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '409':
           description: Username atau No HP sudah digunakan
           content:
@@ -705,31 +588,15 @@ paths:
                   value:
                     error: Nomor hp sudah digunakan
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Admin Puskesmas
       summary: Delete admin puskesmas
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -748,15 +615,7 @@ paths:
                     type: string
                     example: Admin puskesmas berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Admin puskesmas masih terkait dengan data pasien yang ada
           content:
@@ -768,35 +627,11 @@ paths:
                     type: string
                     example: Admin puskesmas masih terkait dengan data pasien yang ada
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-apotek/login:
     post:
       tags:
@@ -807,15 +642,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/login'
       responses:
         '200':
           description: Successful login
@@ -838,32 +665,16 @@ paths:
                     type: string
                     example: Username atau password salah
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-apotek/current:
     get:
       tags:
         - Admin Apotek
       summary: Get current admin apotek
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -872,6 +683,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  waktuOperasional:
+                    type: string
                   namaApotek:
                     type: string
                   telepon:
@@ -879,31 +692,15 @@ paths:
                   alamat:
                     type: string
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Admin Apotek
       summary: Update current admin apotek
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -911,6 +708,8 @@ paths:
             schema:
               type: object
               properties:
+                waktuOperasional:
+                  type: string
                 namaApotek:
                   type: string
                 telepon:
@@ -919,6 +718,7 @@ paths:
                   type: string
               required:
                 - namaApotek
+                - waktuOperasional
                 - telepon
                 - alamat
       responses:
@@ -943,46 +743,14 @@ paths:
                     type: string
                     example: Nomor hp sudah digunakan
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
 
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
   /api/admin-apotek/current/password:
     patch:
@@ -990,24 +758,13 @@ paths:
         - Admin Apotek
       summary: Update admin apotek password
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                currentPassword:
-                  type: string
-                newPassword:
-                  type: string
-                confirmPassword:
-                  type: string
-              required:
-                - confirmPassword
-                - currentPassword
-                - newPassword
+              $ref: '#/components/schemas/password'
       responses:
         '200':
           description: Password berhasil diganti
@@ -1020,15 +777,7 @@ paths:
                     type: string
                     example: Password berhasil diganti
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
           description: Password saat ini salah
           content:
@@ -1040,32 +789,16 @@ paths:
                     type: string
                     example: Password saat ini salah
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-apotek:
     get:
       tags:
         - Admin Apotek
       summary: Get all admin apotek
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -1077,42 +810,17 @@ paths:
                   data:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        namaApotek:
-                          type: string
-                        telepon:
-                          type: string
-                        alamat:
-                          type: string
+                      $ref: '#/components/schemas/get_apotek'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Admin Apotek
       summary: Create new admin apotek
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -1120,6 +828,8 @@ paths:
             schema:
               type: object
               properties:
+                waktuOperasional:
+                  type: string
                 namaApotek:
                   type: string
                 username:
@@ -1132,6 +842,7 @@ paths:
                   type: string
               required:
                 - namaApotek
+                - waktuOperasional
                 - username
                 - password
                 - telepon
@@ -1148,25 +859,9 @@ paths:
                     type: string
                     example: Admin apotek berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '409':
           description: Username atau No HP sudah digunakan
           content:
@@ -1184,22 +879,14 @@ paths:
                   value:
                     error: Nomor hp sudah digunakan
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/admin-apotek/{id}:
     get:
       tags:
         - Admin Apotek
       summary: Get admin apotek by id
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -1215,54 +902,19 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      namaApotek:
-                        type: string
-                      username:
-                        type: string
-                      telepon:
-                        type: string
-                      alamat:
-                        type: string
+                    $ref: '#/components/schemas/get_apotek'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Admin Apotek
       summary: Update admin apotek
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -1276,6 +928,8 @@ paths:
             schema:
               type: object
               properties:
+                waktuOperasional:
+                  type: string
                 namaApotek:
                   type: string
                 username:
@@ -1289,6 +943,7 @@ paths:
                   type: string
               required:
                 - namaApotek
+                - waktuOperasional
                 - username
                 - telepon
                 - alamat
@@ -1304,25 +959,9 @@ paths:
                     type: string
                     example: Admin apotek berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '409':
           description: Username atau No HP sudah digunakan
           content:
@@ -1340,31 +979,15 @@ paths:
                   value:
                     error: Nomor hp sudah digunakan
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Admin Apotek
       summary: Delete admin apotek
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -1383,15 +1006,7 @@ paths:
                     type: string
                     example: Admin apotek berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Admin apotek masih terkait dengan data obat yang ada
           content:
@@ -1403,35 +1018,11 @@ paths:
                     type: string
                     example: Admin apotek masih terkait dengan data obat yang ada
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna/login:
     post:
       tags:
@@ -1442,15 +1033,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/login'
       responses:
         '200':
           description: Successful login
@@ -1473,32 +1056,16 @@ paths:
                     type: string
                     example: Username atau password salah
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna/current:
     get:
       tags:
         - Pengguna
       summary: Get current pengguna
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -1519,31 +1086,15 @@ paths:
                       alamat:
                         type: string
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Pengguna
       summary: Update current pengguna
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -1578,15 +1129,7 @@ paths:
                     type: string
                     example: Pengguna berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: No HP sudah digunakan
           content:
@@ -1598,59 +1141,24 @@ paths:
                     type: string
                     example: No HP sudah digunakan
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna/current/password:
     patch:
       tags:
         - Pengguna
       summary: Update pengguna password
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                currentPassword:
-                  type: string
-                newPassword:
-                  type: string
-                confirmPassword:
-                  type: string
-              required:
-                - confirmPassword
-                - currentPassword
-                - newPassword
+              $ref: '#/components/schemas/password'
 
       responses:
         '200':
@@ -1664,15 +1172,7 @@ paths:
                     type: string
                     example: Password berhasil diganti
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
           description: Password saat ini salah
           content:
@@ -1684,32 +1184,16 @@ paths:
                     type: string
                     example: Password saat ini salah
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna:
     get:
       tags:
         - Pengguna
-      summary: Get all penggunas
+      summary: Get all pengguna
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -1721,38 +1205,11 @@ paths:
                   data:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        namaLengkap:
-                          type: string
-                        telepon:
-                          type: string
-                        teleponKeluarga:
-                          type: string
-                        alamat:
-                          type: string
+                      $ref: '#/components/schemas/get_pengguna'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Pengguna
@@ -1795,25 +1252,9 @@ paths:
                     type: string
                     example: Pengguna berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '409':
           description: Username atau No HP sudah digunakan
           content:
@@ -1831,22 +1272,14 @@ paths:
                   value:
                     error: Nomor hp sudah digunakan
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna/{id}:
     get:
       tags:
         - Pengguna
       summary: Get pengguna by id
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -1862,57 +1295,20 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      namaLengkap:
-                        type: string
-                      telepon:
-                        type: string
-                      teleponKeluarga:
-                        type: string
-                      alamat:
-                        type: string
-                      username:
-                        type: string
+                    $ref: '#/components/schemas/get_pengguna'
 
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Pengguna
       summary: Update pengguna
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -1957,25 +1353,9 @@ paths:
                     type: string
                     example: Pengguna berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '409':
           description: Username atau No HP sudah digunakan
           content:
@@ -1993,31 +1373,15 @@ paths:
                   value:
                     error: Nomor hp sudah digunakan
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Pengguna
       summary: Delete pengguna
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2036,15 +1400,7 @@ paths:
                     type: string
                     example: Pengguna berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Pengguna masih terkait dengan data pasien yang ada
           content:
@@ -2056,42 +1412,18 @@ paths:
                     type: string
                     example: Pengguna masih terkait dengan data pasien yang ada
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/obat:
     get:
       tags:
         - Obat
       summary: Get all obat
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response
@@ -2112,42 +1444,19 @@ paths:
                         jumlah:
                           type: integer
                         adminApotek:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            namaApotek:
-                              type: string
-                            telepon:
-                              type: string
-                            alamat:
-                              type: string
+                          $ref: '#/components/schemas/get_apotek'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Obat
       summary: Create new obat
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -2177,52 +1486,22 @@ paths:
                     type: string
                     example: Obat berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/obat/{id}:
     get:
       tags:
         - Obat
       summary: Get obat by id
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2248,41 +1527,19 @@ paths:
                         type: integer
 
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Obat
       summary: Update obat
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2318,51 +1575,21 @@ paths:
                     type: string
                     example: Obat berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Obat
       summary: Delete obat
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2381,15 +1608,7 @@ paths:
                     type: string
                     example: Obat berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Obat masih terkait dengan data pengambilan obat yang ada
           content:
@@ -2401,42 +1620,20 @@ paths:
                     type: string
                     example: Obat masih terkait dengan data pengambilan obat yang ada
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pasien:
     get:
       tags:
         - Pasien
       summary: Get all pasien
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - in: query
           name: status
@@ -2449,94 +1646,22 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        noRekamMedis:
-                          type: string
-                        adminPuskesmas:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            namaPuskesmas:
-                              type: string
-                            telepon:
-                              type: string
-                            alamat:
-                              type: string
-                        pengguna:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            namaLengkap:
-                              type: string
-                            telepon:
-                              type: string
-                            teleponKeluarga:
-                              type: string
-                            alamat:
-                              type: string
-                        beratBadan:
-                          type: integer
-                        tinggiBadan:
-                          type: integer
-                        tekananDarah:
-                          type: string
-                        denyutNadi:
-                          type: integer
-                        hasilLab:
-                          type: string
-                        hasilEkg:
-                          type: string
-                        tanggalPeriksa:
-                          type: integer
-                        status:
-                          type: string
+                $ref: '#/components/schemas/get_pasien'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
     post:
       tags:
         - Pasien
       summary: Create new pasien aktif
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -2550,31 +1675,13 @@ paths:
                   type: integer
                 idPengguna:
                   type: integer
-                beratBadan:
-                  type: integer
-                tinggiBadan:
-                  type: integer
-                tekananDarah:
-                  type: string
-                denyutNadi:
-                  type: integer
-                hasilLab:
-                  type: string
-                  nullable: true
-                hasilEkg:
-                  type: string
-                  nullable: true
-                tanggalPeriksa:
+                tanggalDaftar:
                   type: integer
               required:
                 - noRekamMedis
                 - idAdminPuskesmas
                 - idPengguna
-                - beratBadan
-                - tinggiBadan
-                - tekananDarah
-                - denyutNadi
-                - tanggalPeriksa
+                - tanggalDaftar
       responses:
         '201':
           description: Pasien berhasil dibuat
@@ -2587,42 +1694,20 @@ paths:
                     type: string
                     example: Pasien berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pasien/{id}:
     get:
       tags:
         - Pasien
       summary: Get pasien aktif by id
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2635,7 +1720,6 @@ paths:
           content:
             application/json:
               schema:
-                type: object
                 properties:
                   data:
                     type: object
@@ -2648,58 +1732,25 @@ paths:
                         type: integer
                       idPengguna:
                         type: integer
-                      beratBadan:
+                      tanggalDaftar:
                         type: integer
-                      tinggiBadan:
-                        type: integer
-                      tekananDarah:
-                        type: string
-                      denyutNadi:
-                        type: integer
-                      hasilLab:
-                        type: string
-                      hasilEkg:
-                        type: string
-                      tanggalPeriksa:
-                        type: integer
-
+        '400':
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
     patch:
       tags:
         - Pasien
       summary: Update pasien aktif
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2711,7 +1762,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               properties:
                 noRekamMedis:
                   type: string
@@ -2719,31 +1769,13 @@ paths:
                   type: integer
                 idPengguna:
                   type: integer
-                beratBadan:
-                  type: integer
-                tinggiBadan:
-                  type: integer
-                tekananDarah:
-                  type: string
-                denyutNadi:
-                  type: integer
-                hasilLab:
-                  type: string
-                  nullable: true
-                hasilEkg:
-                  type: string
-                  nullable: true
-                tanggalPeriksa:
+                tanggalDaftar:
                   type: integer
               required:
                 - noRekamMedis
                 - idAdminPuskesmas
                 - idPengguna
-                - beratBadan
-                - tinggiBadan
-                - tekananDarah
-                - denyutNadi
-                - tanggalPeriksa
+                - tanggalDaftar
       responses:
         '200':
           description: Pasien berhasil diupdate
@@ -2756,51 +1788,21 @@ paths:
                     type: string
                     example: Pasien berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Pasien
       summary: Delete pasien selesai
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2819,15 +1821,7 @@ paths:
                     type: string
                     example: Pasien berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Pasien masih terkait dengan data yang ada
           content:
@@ -2845,42 +1839,20 @@ paths:
                   value:
                     error: Pasien masih terkait dengan data pengambilan obat yang ada
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pasien/{id}/selesai:
     patch:
       tags:
         - Pasien
       summary: Tandai pasien aktif sebagai selesai
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -2899,15 +1871,7 @@ paths:
                     type: string
                     example: Pasien berhasil ditandai selesai
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Pasien masih memiliki kontrol balik
           content:
@@ -2925,42 +1889,20 @@ paths:
                   value:
                     error: Pasien masih memiliki pengambilan obat yang harus dilakukan
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/kontrol-balik:
     get:
       tags:
         - Kontrol Balik
       summary: Get all kontrol balik
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - in: query
           name: status
@@ -2982,94 +1924,45 @@ paths:
                       properties:
                         id:
                           type: integer
+                        noAntrean:
+                          type: integer
                         pasien:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            noRekamMedis:
-                              type: string
-                            adminPuskesmas:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                namaPuskesmas:
-                                  type: string
-                                telepon:
-                                  type: string
-                                alamat:
-                                  type: string
-                            pengguna:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                namaLengkap:
-                                  type: string
-                                telepon:
-                                  type: string
-                                teleponKeluarga:
-                                  type: string
-                                alamat:
-                                  type: string
-                            beratBadan:
-                              type: integer
-                            tinggiBadan:
-                              type: integer
-                            tekananDarah:
-                              type: string
-                            denyutNadi:
-                              type: integer
-                            hasilLab:
-                              type: string
-                            hasilEkg:
-                              type: string
-                            tanggalPeriksa:
-                              type: integer
-                            status:
-                              type: string
+                          $ref: '#/components/schemas/get_pasien'
+                        keluhan:
+                          type: string
+                        tinggiBadan:
+                          type: integer
+                        tekananDarah:
+                          type: string
+                        denyutNadi:
+                          type: integer
+                        hasilLab:
+                          type: string
+                        beratBadan:
+                          type: integer
+                        hasilEkg:
+                          type: string
+                        hasilDiagnosa:
+                          type: string
                         tanggalKontrol:
                           type: integer
                         status:
                           type: string
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
     post:
       tags:
         - Kontrol Balik
       summary: Create new kontrol balik menunggu
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -3081,10 +1974,7 @@ paths:
                   type: integer
                 tanggalKontrol:
                   type: integer
-                status:
-                  type: string
               required:
-                - status
                 - idPasien
                 - tanggalKontrol
       responses:
@@ -3099,42 +1989,20 @@ paths:
                     type: string
                     example: Kontrol balik berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/kontrol-balik/{id}:
     get:
       tags:
         - Kontrol Balik
       summary: Get kontrol balik menunggu by id
       security:
-        - jwtAuth: []
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -3154,47 +2022,45 @@ paths:
                     properties:
                       id:
                         type: integer
+                      noAntrean:
+                        type: integer
                       idPasien:
                         type: integer
+                      keluhan:
+                        type: string
+                      tinggiBadan:
+                        type: integer
+                      tekananDarah:
+                        type: string
+                      denyutNadi:
+                        type: integer
+                      hasilLab:
+                        type: string
+                      beratBadan:
+                        type: integer
+                      hasilEkg:
+                        type: string
+                      hasilDiagnosa:
+                        type: string
                       tanggalKontrol:
                         type: integer
+                      status:
+                        type: string
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
     patch:
       tags:
         - Kontrol Balik
       summary: Update kontrol balik menunggu
       security:
-        - jwtAuth: []
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -3208,14 +2074,38 @@ paths:
             schema:
               type: object
               properties:
+                noAntrean:
+                  type: integer
                 idPasien:
                   type: integer
+                keluhan:
+                  type: string
+                  nullable: true
+                tinggiBadan:
+                  type: integer
+                  nullable: true
+                tekananDarah:
+                  type: string
+                  nullable: true
+                denyutNadi:
+                  type: integer
+                  nullable: true
+                hasilLab:
+                  type: string
+                  nullable: true
+                beratBadan:
+                  type: integer
+                  nullable: true
+                hasilEkg:
+                  type: string
+                  nullable: true
+                hasilDiagnosa:
+                  type: string
+                  nullable: true
                 tanggalKontrol:
                   type: integer
-                status:
-                  type: string
               required:
-                - status
+                - noAntrean
                 - idPasien
                 - tanggalKontrol
       responses:
@@ -3230,7 +2120,9 @@ paths:
                     type: string
                     example: Kontrol balik berhasil diupdate
         '400':
-          description: Bad request
+          $ref: '#/components/responses/BadRequestError'
+        '409':
+          description: Nomor antrean pada tanggal tersebut sudah digunakan
           content:
             application/json:
               schema:
@@ -3238,43 +2130,21 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: Bad request
+              example: Nomor antrean pada tanggal tersebut sudah digunakan
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Kontrol Balik
       summary: Delete kontrol balik selesai atau batal
       security:
-        - jwtAuth: []
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -3293,52 +2163,22 @@ paths:
                     type: string
                     example: Kontrol balik berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/kontrol-balik/{id}/selesai:
     patch:
       tags:
         - Kontrol Balik
       summary: Tandai kontrol balik menunggu sebagai selesai
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3357,52 +2197,22 @@ paths:
                     type: string
                     example: Pasien berhasil ditandai selesai
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/kontrol-balik/{id}/batal:
     patch:
       tags:
         - Kontrol Balik
       summary: Tandai kontrol balik menunggu sebagai batal
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3421,52 +2231,22 @@ paths:
                     type: string
                     example: Kontrol balik berhasil ditandai batal
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengambilan-obat:
     get:
       tags:
         - Pengambilan Obat
       summary: Get all pengambilan obat
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - in: query
           name: status
@@ -3500,63 +2280,9 @@ paths:
                             jumlah:
                               type: integer
                             adminApotek:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                namaApotek:
-                                  type: string
-                                telepon:
-                                  type: string
-                                alamat:
-                                  type: string
+                              $ref: '#/components/schemas/get_apotek'
                         pasien:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            noRekamMedis:
-                              type: string
-                            adminPuskesmas:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                namaPuskesmas:
-                                  type: string
-                                telepon:
-                                  type: string
-                                alamat:
-                                  type: string
-                            pengguna:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                namaLengkap:
-                                  type: string
-                                telepon:
-                                  type: string
-                                teleponKeluarga:
-                                  type: string
-                                alamat:
-                                  type: string
-                            beratBadan:
-                              type: integer
-                            tinggiBadan:
-                              type: integer
-                            tekananDarah:
-                              type: string
-                            denyutNadi:
-                              type: integer
-                            hasilLab:
-                              type: string
-                            hasilEkg:
-                              type: string
-                            tanggalPeriksa:
-                              type: integer
-                            status:
-                              type: string
+                          $ref: '#/components/schemas/get_pasien'
                         jumlah:
                           type: integer
                         tanggalPengambilan:
@@ -3564,42 +2290,18 @@ paths:
                         status:
                           type: string
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
     post:
       tags:
         - Pengambilan Obat
       summary: Create new pengambilan obat menunggu
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -3636,15 +2338,7 @@ paths:
                     type: string
                     example: Pengambilan obat berhasil dibuat
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Jumlah obat melebihi persediaan apotek
           content:
@@ -3656,32 +2350,18 @@ paths:
                     type: string
                     example: Jumlah obat melebihi persediaan apotek
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengambilan-obat/{id}:
     get:
       tags:
         - Pengambilan Obat
       summary: Get pengambilan obat menunggu by id
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3710,42 +2390,20 @@ paths:
                       tanggalPengambilan:
                         type: integer
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
 
     patch:
       tags:
         - Pengambilan Obat
       summary: Update pengambilan obat menunggu
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3785,15 +2443,7 @@ paths:
                     type: string
                     example: Pengambilan obat berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '409':
           description: Jumlah obat melebihi persediaan apotek
           content:
@@ -3805,41 +2455,19 @@ paths:
                     type: string
                     example: Jumlah obat melebihi persediaan apotek
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Pengambilan Obat
       summary: Delete pengambilan obat diambil atau batal
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3858,52 +2486,22 @@ paths:
                     type: string
                     example: Pengambilan obat berhasil dihapus
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengambilan-obat/{id}/diambil:
     patch:
       tags:
         - Pengambilan Obat
       summary: Tandai pengambilan obat menunggu sebagai diambil
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3922,52 +2520,22 @@ paths:
                     type: string
                     example: Pengambilan obat berhasil ditandai diambil
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengambilan-obat/{id}/batal:
     patch:
       tags:
         - Pengambilan Obat
       summary: Tandai pengambilan obat menunggu sebagai batal
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -3986,52 +2554,22 @@ paths:
                     type: string
                     example: Pengambilan obat berhasil ditandai batal
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna/current/perangkat:
     patch:
       tags:
         - Pengguna
       summary: Update tokenPerangkat
       security:
-        - jwtAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -4055,42 +2593,12 @@ paths:
                     type: string
                     example: Token perangkat pengguna berhasil diupdate
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Bad request
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Not found
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Internal server error
+          $ref: '#/components/responses/InternalServerError'

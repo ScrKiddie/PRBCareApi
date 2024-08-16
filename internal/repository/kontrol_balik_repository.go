@@ -70,3 +70,26 @@ func (r *KontrolBalikRepository) FindByIdPasien(db *gorm.DB, kontrolBalik *entit
 	return db.Where("id_pasien = ?", idPasien).
 		First(&kontrolBalik).Error
 }
+
+func (r *KontrolBalikRepository) FindMaksNoAntreanByTanggalKontrol(db *gorm.DB, tanggalKontrol int64) (int32, error) {
+	var maxNoAntrean *int32
+	err := db.Model(&entity.KontrolBalik{}).
+		Where("tanggal_kontrol = ?", tanggalKontrol).
+		Select("MAX(no_antrean)").
+		Scan(&maxNoAntrean).Error
+	if err != nil {
+		return 0, err
+	}
+	if maxNoAntrean == nil {
+		return 0, nil
+	}
+	return *maxNoAntrean, nil
+}
+
+func (r *KontrolBalikRepository) CountByNoAntreanAndTanggalKontrol(db *gorm.DB, noAntrean int32, tanggalKontrol int64) (int64, error) {
+	var count int64
+	if err := db.Model(&entity.KontrolBalik{}).Where("no_antrean = ?", noAntrean).Where(" tanggal_kontrol = ?", tanggalKontrol).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
