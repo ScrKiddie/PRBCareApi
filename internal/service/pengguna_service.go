@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
@@ -10,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"
+	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -21,6 +21,7 @@ type PenggunaService struct {
 	DB                 *gorm.DB
 	PenggunaRepository *repository.PenggunaRepository
 	PasienRepository   *repository.PasienRepository
+	RecaptchaAdapter   *adapter.Recaptcha
 	Validator          *validator.Validate
 	Config             *viper.Viper
 }
@@ -29,8 +30,9 @@ func NewPenggunaService(db *gorm.DB,
 	penggunaRepository *repository.PenggunaRepository,
 	pasienRepository *repository.PasienRepository,
 	validator *validator.Validate,
+	recaptchaAdapter *adapter.Recaptcha,
 	config *viper.Viper) *PenggunaService {
-	return &PenggunaService{db, penggunaRepository, pasienRepository, validator, config}
+	return &PenggunaService{db, penggunaRepository, pasienRepository, recaptchaAdapter, validator, config}
 }
 
 func (s *PenggunaService) List(ctx context.Context) (*[]model.PenggunaResponse, error) {
@@ -243,6 +245,74 @@ func (s *PenggunaService) Delete(ctx context.Context, request *model.PenggunaDel
 	return nil
 }
 
+func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaRegisterRequest) error {
+	tx := s.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := s.Validator.Struct(request); err != nil {
+		log.Println(err.Error())
+		return fiber.ErrBadRequest
+	}
+
+	recaptchaRequest := &model.RecaptchaRequest{
+		TokenRecaptcha: request.TokenRecaptcha,
+		Secret:         s.Config.GetString("recaptcha.secret"),
+	}
+
+	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	if err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+	if !ok {
+		return fiber.ErrBadRequest
+	}
+
+	total, err := s.PenggunaRepository.CountByUsername(tx, request.Username)
+	if err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+	if total > 0 {
+		return fiber.NewError(fiber.StatusConflict, "Username sudah digunakan")
+	}
+
+	total, err = s.PenggunaRepository.CountByTelepon(tx, request.Telepon)
+	if err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+	if total > 0 {
+		return fiber.NewError(fiber.StatusConflict, "Telepon sudah digunakan")
+	}
+
+	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+
+	penggunaEnity := new(entity.Pengguna)
+	penggunaEnity.Username = request.Username
+	penggunaEnity.NamaLengkap = request.NamaLengkap
+	penggunaEnity.Alamat = request.Alamat
+	penggunaEnity.Telepon = request.Telepon
+	penggunaEnity.TeleponKeluarga = request.TeleponKeluarga
+	penggunaEnity.Password = string(password)
+
+	if err := s.PenggunaRepository.Create(tx, penggunaEnity); err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+
+	return nil
+}
+
 func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLoginRequest) (*model.PenggunaResponse, error) {
 	tx := s.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
@@ -357,7 +427,7 @@ func (s *PenggunaService) CurrentProfileUpdate(ctx context.Context, request *mod
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
-	fmt.Println(total)
+
 	if total > 0 && pengguna.Telepon != request.Telepon {
 		return fiber.NewError(fiber.StatusConflict, "Telepon sudah digunakan")
 	}

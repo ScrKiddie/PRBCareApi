@@ -154,7 +154,10 @@ func (c *PenggunaController) Get(ctx fiber.Ctx) error {
 }
 
 func (c *PenggunaController) Create(ctx fiber.Ctx) error {
-
+	auth := middleware.GetAuth(ctx)
+	if auth.Role != constant.RoleAdminSuper {
+		return fiber.ErrForbidden
+	}
 	request := new(model.PenggunaCreateRequest)
 
 	if err := ctx.Bind().JSON(request); err != nil {
@@ -173,6 +176,27 @@ func (c *PenggunaController) Create(ctx fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"data": "Pengguna berhasil dibuat"})
+}
+
+func (c *PenggunaController) Register(ctx fiber.Ctx) error {
+	request := new(model.PenggunaRegisterRequest)
+
+	if err := ctx.Bind().JSON(request); err != nil {
+		log.Println(err.Error())
+		return fiber.ErrBadRequest
+	}
+
+	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+
+	if err := c.PenggunaService.Register(ctx.UserContext(), request); err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"data": "Registrasi pengguna berhasil"})
 }
 
 func (c *PenggunaController) Update(ctx fiber.Ctx) error {

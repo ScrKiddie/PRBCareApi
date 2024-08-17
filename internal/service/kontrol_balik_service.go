@@ -151,19 +151,20 @@ func (s *KontrolBalikService) Create(ctx context.Context, request *model.Kontrol
 		return fiber.ErrBadRequest
 	}
 
+	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
-		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, &entity.Pasien{}, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
+		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
 			log.Println(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
-		if err := s.PasienRepository.FindByIdAndStatus(tx, &entity.Pasien{}, request.IdPasien, constant.StatusPasienAktif); err != nil {
+		if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.IdPasien, constant.StatusPasienAktif); err != nil {
 			log.Println(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
-	noAntrean, err := s.KontrolBalikRepository.FindMaksNoAntreanByTanggalKontrol(tx, request.TanggalKontrol)
+	noAntrean, err := s.KontrolBalikRepository.FindMaksNoAntreanByTanggalKontrolAndIdAdminPuskesmasAndStatus(tx, request.TanggalKontrol, pasien.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu)
 	if err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
@@ -209,25 +210,25 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 			return fiber.ErrNotFound
 		}
 	}
-
+	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
-		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, &entity.Pasien{}, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
+		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
 			log.Println(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
-		if err := s.PasienRepository.FindByIdAndStatus(tx, &entity.Pasien{}, request.IdPasien, constant.StatusPasienAktif); err != nil {
+		if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.IdPasien, constant.StatusPasienAktif); err != nil {
 			log.Println(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
-	total, err := s.KontrolBalikRepository.CountByNoAntreanAndTanggalKontrol(tx, request.NoAntrean, request.TanggalKontrol)
+	total, err := s.KontrolBalikRepository.CountByNoAntreanAndTanggalKontrolAndIdAdminPuskesmasAndStatus(tx, request.NoAntrean, request.TanggalKontrol, pasien.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu)
 	if err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
 	}
-	if total > 0 {
+	if total > 0 && kontrolBalik.NoAntrean != request.NoAntrean {
 		return fiber.NewError(fiber.StatusConflict, "Nomor antrean pada tanggal tersebut sudah digunakan")
 	}
 

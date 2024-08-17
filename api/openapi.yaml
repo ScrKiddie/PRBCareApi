@@ -1023,6 +1023,73 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/pengguna/register:
+    post:
+      tags:
+        - Pengguna
+      summary: Register new pengguna
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namaLengkap:
+                  type: string
+                telepon:
+                  type: string
+                teleponKeluarga:
+                  type: string
+                alamat:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+                tokenRecaptcha:
+                  type: string
+              required:
+                - namaLengkap
+                - telepon
+                - teleponKeluarga
+                - alamat
+                - username
+                - password
+                - tokenRecaptcha
+      responses:
+        '201':
+          description: Pengguna berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Pengguna berhasil dibuat
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: Username atau No HP sudah digunakan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              examples:
+                usernameUsed:
+                  value:
+                    error: username sudah digunakan
+                teleponNumberUsed:
+                  value:
+                    error: Nomor hp sudah digunakan
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/pengguna/login:
     post:
       tags:
@@ -1213,7 +1280,7 @@ paths:
     post:
       tags:
         - Pengguna
-      summary: Create or register new pengguna
+      summary: Create new pengguna
       requestBody:
         required: true
         content:
@@ -1271,6 +1338,8 @@ paths:
                 teleponNumberUsed:
                   value:
                     error: Nomor hp sudah digunakan
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/pengguna/{id}:

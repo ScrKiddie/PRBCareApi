@@ -95,10 +95,6 @@ func (c *AdminApotekController) CurrentPasswordUpdate(ctx fiber.Ctx) error {
 }
 
 func (c *AdminApotekController) List(ctx fiber.Ctx) error {
-	auth := middleware.GetAuth(ctx)
-	if auth.Role != constant.RoleAdminSuper {
-		return fiber.ErrForbidden
-	}
 	response, err := c.AdminApotekService.List(ctx.Context())
 	if err != nil {
 		log.Println(err.Error())

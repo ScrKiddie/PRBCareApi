@@ -32,7 +32,9 @@ func (c *Config) SetupGuestRoute() {
 	c.App.Post("/api/admin-puskesmas/login", c.AdminPuskesmasController.Login)
 	c.App.Post("/api/admin-apotek/login", c.AdminApotekController.Login)
 	c.App.Post("/api/pengguna/login", c.PenggunaController.Login)
-	c.App.Post("/api/pengguna", c.PenggunaController.Create)
+	c.App.Post("/api/pengguna/register", c.PenggunaController.Register)
+	c.App.Get("/api/admin-puskesmas", c.AdminPuskesmasController.List)
+	c.App.Get("/api/admin-apotek", c.AdminApotekController.List)
 }
 
 func (c *Config) SetupAuthRoute() {
@@ -43,7 +45,6 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Get("/api/admin-puskesmas/current", c.AdminPuskesmasController.Current)
 	c.App.Patch("/api/admin-puskesmas/current", c.AdminPuskesmasController.CurrentProfileUpdate)
 	c.App.Patch("/api/admin-puskesmas/current/password", c.AdminPuskesmasController.CurrentPasswordUpdate)
-	c.App.Get("/api/admin-puskesmas", c.AdminPuskesmasController.List)
 	c.App.Get("/api/admin-puskesmas/:id", c.AdminPuskesmasController.Get)
 	c.App.Post("/api/admin-puskesmas", c.AdminPuskesmasController.Create)
 	c.App.Patch("/api/admin-puskesmas/:id", c.AdminPuskesmasController.Update)
@@ -52,7 +53,6 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Get("/api/admin-apotek/current", c.AdminApotekController.Current)
 	c.App.Patch("/api/admin-apotek/current", c.AdminApotekController.CurrentProfileUpdate)
 	c.App.Patch("/api/admin-apotek/current/password", c.AdminApotekController.CurrentPasswordUpdate)
-	c.App.Get("/api/admin-apotek", c.AdminApotekController.List)
 	c.App.Get("/api/admin-apotek/:id", c.AdminApotekController.Get)
 	c.App.Post("/api/admin-apotek", c.AdminApotekController.Create)
 	c.App.Patch("/api/admin-apotek/:id", c.AdminApotekController.Update)

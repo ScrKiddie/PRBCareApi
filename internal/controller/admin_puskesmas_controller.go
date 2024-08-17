@@ -95,10 +95,6 @@ func (c *AdminPuskesmasController) CurrentPasswordUpdate(ctx fiber.Ctx) error {
 }
 
 func (c *AdminPuskesmasController) List(ctx fiber.Ctx) error {
-	auth := middleware.GetAuth(ctx)
-	if auth.Role != constant.RoleAdminSuper {
-		return fiber.ErrForbidden
-	}
 	response, err := c.AdminPuskesmasService.List(ctx.Context())
 	if err != nil {
 		log.Println(err.Error())

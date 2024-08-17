@@ -9,6 +9,17 @@ type PenggunaResponse struct {
 	Username        string `json:"username,omitempty"`
 	Token           string `json:"token,omitempty"`
 }
+
+type PenggunaRegisterRequest struct {
+	NamaLengkap     string `json:"namaLengkap" mod:"normalize_spaces" validate:"required,min=3,max=50"`
+	Telepon         string `json:"telepon" validate:"required,min=10,max=16,not_contain_space"`
+	TeleponKeluarga string `json:"teleponKeluarga" validate:"required,min=10,max=16,not_contain_space"`
+	Alamat          string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3"`
+	Username        string `json:"username" validate:"required,min=6,max=50,not_contain_space"`
+	Password        string `json:"password" validate:"required,min=6,max=255,is_password_format,not_contain_space"`
+	TokenRecaptcha  string `json:"tokenRecaptcha" validate:"required"`
+}
+
 type PenggunaLoginRequest struct {
 	Username string `json:"username" validate:"required,min=6,max=50,not_contain_space"`
 	Password string `json:"password" validate:"required,min=6,max=255,is_password_format,not_contain_space"`
@@ -26,6 +37,7 @@ type PenggunaProfileUpdateRequest struct {
 	TeleponKeluarga string `json:"teleponKeluarga" validate:"required,min=10,max=16,not_contain_space"`
 	Alamat          string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3"`
 }
+
 type PenggunaVerifyRequest struct {
 	ID int32 `validate:"required,numeric"`
 }

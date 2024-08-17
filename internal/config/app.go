@@ -4,8 +4,10 @@ import (
 	"github.com/go-playground/mold/v4"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/client"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
+	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/controller"
 	"prb_care_api/internal/middleware"
 	"prb_care_api/internal/repository"
@@ -16,6 +18,7 @@ import (
 type BootstrapConfig struct {
 	DB       *gorm.DB
 	App      *fiber.App
+	Client   *client.Client
 	Validate *validator.Validate
 	Config   *viper.Viper
 	Modifier *mold.Transformer
@@ -32,10 +35,12 @@ func Bootstrap(config *BootstrapConfig) {
 	kontrolBalikRepository := repository.NewKontrolBalikRepository()
 	pengambilanObatRepository := repository.NewPengambilanObatRepository()
 
+	captchaAdapter := adapter.NewRecaptcha(config.Client)
+
 	adminSuperService := service.NewAdminSuperService(config.DB, adminSuperRepository, config.Validate, config.Config)
 	adminPuskesmasService := service.NewAdminPuskesmasService(config.DB, adminPuskesmasRepository, pasienRepository, config.Validate, config.Config)
 	adminApotekService := service.NewAdminApotekService(config.DB, adminApotekRepository, obatRepository, config.Validate, config.Config)
-	penggunaService := service.NewPenggunaService(config.DB, penggunaRepository, pasienRepository, config.Validate, config.Config)
+	penggunaService := service.NewPenggunaService(config.DB, penggunaRepository, pasienRepository, config.Validate, captchaAdapter, config.Config)
 	obatService := service.NewObatService(config.DB, obatRepository, adminApotekRepository, pengambilanObatRepository, config.Validate)
 	pasienService := service.NewPasienService(config.DB, pasienRepository, adminPuskesmasRepository, penggunaRepository, kontrolBalikRepository, pengambilanObatRepository, config.Validate)
 	kontrolBalikService := service.NewKontrolBalikService(config.DB, kontrolBalikRepository, pasienRepository, config.Validate)
