@@ -322,6 +322,20 @@ func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLogi
 		return nil, fiber.ErrBadRequest
 	}
 
+	recaptchaRequest := &model.RecaptchaRequest{
+		TokenRecaptcha: request.TokenRecaptcha,
+		Secret:         s.Config.GetString("recaptcha.secret"),
+	}
+
+	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, fiber.ErrInternalServerError
+	}
+	if !ok {
+		return nil, fiber.ErrBadRequest
+	}
+
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindByUsername(tx, pengguna, request.Username); err != nil {
 		log.Println(err.Error())

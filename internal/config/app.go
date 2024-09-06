@@ -37,9 +37,9 @@ func Bootstrap(config *BootstrapConfig) {
 
 	captchaAdapter := adapter.NewRecaptcha(config.Client)
 
-	adminSuperService := service.NewAdminSuperService(config.DB, adminSuperRepository, config.Validate, config.Config)
-	adminPuskesmasService := service.NewAdminPuskesmasService(config.DB, adminPuskesmasRepository, pasienRepository, config.Validate, config.Config)
-	adminApotekService := service.NewAdminApotekService(config.DB, adminApotekRepository, obatRepository, config.Validate, config.Config)
+	adminSuperService := service.NewAdminSuperService(config.DB, adminSuperRepository, captchaAdapter, config.Validate, config.Config)
+	adminPuskesmasService := service.NewAdminPuskesmasService(config.DB, adminPuskesmasRepository, pasienRepository, captchaAdapter, config.Validate, config.Config)
+	adminApotekService := service.NewAdminApotekService(config.DB, adminApotekRepository, obatRepository, config.Validate, captchaAdapter, config.Config)
 	penggunaService := service.NewPenggunaService(config.DB, penggunaRepository, pasienRepository, config.Validate, captchaAdapter, config.Config)
 	obatService := service.NewObatService(config.DB, obatRepository, adminApotekRepository, pengambilanObatRepository, config.Validate)
 	pasienService := service.NewPasienService(config.DB, pasienRepository, adminPuskesmasRepository, penggunaRepository, kontrolBalikRepository, pengambilanObatRepository, config.Validate)

@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"
+	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -20,6 +21,7 @@ type AdminPuskesmasService struct {
 	DB                       *gorm.DB
 	AdminPuskesmasRepository *repository.AdminPuskesmasRepository
 	PasienRepository         *repository.PasienRepository
+	RecaptchaAdapter         *adapter.Recaptcha
 	Validator                *validator.Validate
 	Config                   *viper.Viper
 }
@@ -27,9 +29,10 @@ type AdminPuskesmasService struct {
 func NewAdminPuskesmasService(db *gorm.DB,
 	adminPuskesmasRepository *repository.AdminPuskesmasRepository,
 	pasienRepository *repository.PasienRepository,
+	recaptchaAdapter *adapter.Recaptcha,
 	validator *validator.Validate,
 	config *viper.Viper) *AdminPuskesmasService {
-	return &AdminPuskesmasService{db, adminPuskesmasRepository, pasienRepository, validator, config}
+	return &AdminPuskesmasService{db, adminPuskesmasRepository, pasienRepository, recaptchaAdapter, validator, config}
 }
 
 func (s *AdminPuskesmasService) List(ctx context.Context) (*[]model.AdminPuskesmasResponse, error) {
@@ -248,6 +251,20 @@ func (s *AdminPuskesmasService) Login(ctx context.Context, request *model.AdminP
 
 	if err := s.Validator.Struct(request); err != nil {
 		log.Println(err.Error())
+		return nil, fiber.ErrBadRequest
+	}
+
+	recaptchaRequest := &model.RecaptchaRequest{
+		TokenRecaptcha: request.TokenRecaptcha,
+		Secret:         s.Config.GetString("recaptcha.secret"),
+	}
+
+	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, fiber.ErrInternalServerError
+	}
+	if !ok {
 		return nil, fiber.ErrBadRequest
 	}
 

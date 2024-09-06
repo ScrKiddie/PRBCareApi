@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"
+	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -20,6 +21,7 @@ type AdminApotekService struct {
 	DB                    *gorm.DB
 	AdminApotekRepository *repository.AdminApotekRepository
 	ObatRepository        *repository.ObatRepository
+	RecaptchaAdapter      *adapter.Recaptcha
 	Validator             *validator.Validate
 	Config                *viper.Viper
 }
@@ -28,8 +30,14 @@ func NewAdminApotekService(db *gorm.DB,
 	adminApotekRepository *repository.AdminApotekRepository,
 	obatRepository *repository.ObatRepository,
 	validator *validator.Validate,
+	recaptchaAdapter *adapter.Recaptcha,
 	config *viper.Viper) *AdminApotekService {
-	return &AdminApotekService{db, adminApotekRepository, obatRepository, validator, config}
+	return &AdminApotekService{db,
+		adminApotekRepository,
+		obatRepository,
+		recaptchaAdapter,
+		validator,
+		config}
 }
 
 func (s *AdminApotekService) List(ctx context.Context) (*[]model.AdminApotekResponse, error) {
@@ -248,6 +256,20 @@ func (s *AdminApotekService) Login(ctx context.Context, request *model.AdminApot
 
 	if err := s.Validator.Struct(request); err != nil {
 		log.Println(err.Error())
+		return nil, fiber.ErrBadRequest
+	}
+
+	recaptchaRequest := &model.RecaptchaRequest{
+		TokenRecaptcha: request.TokenRecaptcha,
+		Secret:         s.Config.GetString("recaptcha.secret"),
+	}
+
+	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, fiber.ErrInternalServerError
+	}
+	if !ok {
 		return nil, fiber.ErrBadRequest
 	}
 

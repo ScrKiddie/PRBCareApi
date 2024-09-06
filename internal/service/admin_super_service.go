@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"
+	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -19,15 +20,17 @@ import (
 type AdminSuperService struct {
 	DB                   *gorm.DB
 	AdminSuperRepository *repository.AdminSuperRepository
+	RecaptchaAdapter     *adapter.Recaptcha
 	Validator            *validator.Validate
 	Config               *viper.Viper
 }
 
 func NewAdminSuperService(db *gorm.DB,
 	adminSuperRepository *repository.AdminSuperRepository,
+	recaptchaAdapter *adapter.Recaptcha,
 	validator *validator.Validate,
 	config *viper.Viper) *AdminSuperService {
-	return &AdminSuperService{db, adminSuperRepository, validator, config}
+	return &AdminSuperService{db, adminSuperRepository, recaptchaAdapter, validator, config}
 }
 
 func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuperLoginRequest) (*model.AdminSuperResponse, error) {
@@ -36,6 +39,20 @@ func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuper
 
 	if err := s.Validator.Struct(request); err != nil {
 		log.Println(err.Error())
+		return nil, fiber.ErrBadRequest
+	}
+
+	recaptchaRequest := &model.RecaptchaRequest{
+		TokenRecaptcha: request.TokenRecaptcha,
+		Secret:         s.Config.GetString("recaptcha.secret"),
+	}
+
+	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, fiber.ErrInternalServerError
+	}
+	if !ok {
 		return nil, fiber.ErrBadRequest
 	}
 
