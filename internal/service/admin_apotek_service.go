@@ -21,7 +21,7 @@ type AdminApotekService struct {
 	DB                    *gorm.DB
 	AdminApotekRepository *repository.AdminApotekRepository
 	ObatRepository        *repository.ObatRepository
-	RecaptchaAdapter      *adapter.Recaptcha
+	RecaptchaAdapter      *adapter.Captcha
 	Validator             *validator.Validate
 	Config                *viper.Viper
 }
@@ -30,12 +30,12 @@ func NewAdminApotekService(db *gorm.DB,
 	adminApotekRepository *repository.AdminApotekRepository,
 	obatRepository *repository.ObatRepository,
 	validator *validator.Validate,
-	recaptchaAdapter *adapter.Recaptcha,
+	captchaAdapter *adapter.Captcha,
 	config *viper.Viper) *AdminApotekService {
 	return &AdminApotekService{db,
 		adminApotekRepository,
 		obatRepository,
-		recaptchaAdapter,
+		captchaAdapter,
 		validator,
 		config}
 }
@@ -259,12 +259,12 @@ func (s *AdminApotekService) Login(ctx context.Context, request *model.AdminApot
 		return nil, fiber.ErrBadRequest
 	}
 
-	recaptchaRequest := &model.RecaptchaRequest{
-		TokenRecaptcha: request.TokenRecaptcha,
-		Secret:         s.Config.GetString("recaptcha.secret"),
+	captchaRequest := &model.CaptchaRequest{
+		TokenCaptcha: request.TokenCaptcha,
+		Secret:       s.Config.GetString("captcha.secret"),
 	}
 
-	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, fiber.ErrInternalServerError

@@ -30,18 +30,18 @@ mudah. Sistem autentikasi dilengkapi untuk memastikan keamanan data.
 PRBCareAPI akan menggunakan environment variables sebagai konfigurasi utama menggantikan `config.json` jika
 variabel-variabel tersebut diset sebelum menjalankan proyek:
 
-| **Key**                  | **Type**     | **Deskripsi**                                                                        | **Contoh**                                      |
-|----------------------|----------|----------------------------------------------------------------------------------|---------------------------------------------|
-| **JWT_SECRET**       | `string` | Secret key untuk JWT.                                                            | `mysecretkey123`                            |
-| **JWT_EXP**          | `int`    | Waktu kadaluwarsa JWT dalam jam.                                                 | `24`                                        |
-| **WEB_PORT**         | `int`    | Port untuk menjalankan server web.                                               | `8080`                                      |
+| **Key**                | **Type**     | **Deskripsi**                                                                        | **Contoh**                                      |
+|--------------------|----------|----------------------------------------------------------------------------------|---------------------------------------------|
+| **JWT_SECRET**     | `string` | Secret key untuk JWT.                                                            | `mysecretkey123`                            |
+| **JWT_EXP**        | `int`    | Waktu kadaluwarsa JWT dalam jam.                                                 | `24`                                        |
+| **WEB_PORT**       | `int`    | Port untuk menjalankan server web.                                               | `8080`                                      |
 | **WEB_CORS_ORIGINS** | `string` | Origins yang diizinkan untuk CORS, dipisahkan dengan spasi jika lebih dari satu. | `http://localhost http://example.com`       |
-| **RECAPTCHA_SECRET** | `string` | Secret key untuk Google reCAPTCHA.                                               | `6LfQzM0UAAAAABfG8qB1T4KQwQ7Js2w9p3sI9sA2` |
-| **DB_USERNAME**      | `string` | Nama pengguna database.                                                          | `root`                                      |
-| **DB_PASSWORD**      | `string` | Kata sandi database.                                                             | `password123`                               |
-| **DB_HOST**          | `string` | Host database.                                                                   | `localhost`                                 |
-| **DB_PORT**          | `int`    | Port koneksi database.                                                           | `3306`                                      |
-| **DB_NAME**          | `string` | Nama database.                                                                   | `prbcare`                                   |
+| **CAPTCHA_SECRET** | `string` | Secret key untuk Cloudflare Turnstile.                                               | `0x4AAAAAAABBBBCCCCDDDD1234567890EE` |
+| **DB_USERNAME**    | `string` | Nama pengguna database.                                                          | `root`                                      |
+| **DB_PASSWORD**    | `string` | Kata sandi database.                                                             | `password123`                               |
+| **DB_HOST**        | `string` | Host database.                                                                   | `localhost`                                 |
+| **DB_PORT**        | `int`    | Port koneksi database.                                                           | `3306`                                      |
+| **DB_NAME**        | `string` | Nama database.                                                                   | `prbcare`                                   |
 
 
 Cara set environment variables:

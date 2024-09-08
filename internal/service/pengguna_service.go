@@ -21,7 +21,7 @@ type PenggunaService struct {
 	DB                 *gorm.DB
 	PenggunaRepository *repository.PenggunaRepository
 	PasienRepository   *repository.PasienRepository
-	RecaptchaAdapter   *adapter.Recaptcha
+	RecaptchaAdapter   *adapter.Captcha
 	Validator          *validator.Validate
 	Config             *viper.Viper
 }
@@ -30,9 +30,9 @@ func NewPenggunaService(db *gorm.DB,
 	penggunaRepository *repository.PenggunaRepository,
 	pasienRepository *repository.PasienRepository,
 	validator *validator.Validate,
-	recaptchaAdapter *adapter.Recaptcha,
+	captchaAdapter *adapter.Captcha,
 	config *viper.Viper) *PenggunaService {
-	return &PenggunaService{db, penggunaRepository, pasienRepository, recaptchaAdapter, validator, config}
+	return &PenggunaService{db, penggunaRepository, pasienRepository, captchaAdapter, validator, config}
 }
 
 func (s *PenggunaService) List(ctx context.Context) (*[]model.PenggunaResponse, error) {
@@ -254,12 +254,12 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 		return fiber.ErrBadRequest
 	}
 
-	recaptchaRequest := &model.RecaptchaRequest{
-		TokenRecaptcha: request.TokenRecaptcha,
-		Secret:         s.Config.GetString("recaptcha.secret"),
+	captchaRequest := &model.CaptchaRequest{
+		TokenCaptcha: request.TokenCaptcha,
+		Secret:       s.Config.GetString("captcha.secret"),
 	}
 
-	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
 		log.Println(err.Error())
 		return fiber.ErrInternalServerError
@@ -322,12 +322,12 @@ func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLogi
 		return nil, fiber.ErrBadRequest
 	}
 
-	recaptchaRequest := &model.RecaptchaRequest{
-		TokenRecaptcha: request.TokenRecaptcha,
-		Secret:         s.Config.GetString("recaptcha.secret"),
+	captchaRequest := &model.CaptchaRequest{
+		TokenCaptcha: request.TokenCaptcha,
+		Secret:       s.Config.GetString("captcha.secret"),
 	}
 
-	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, fiber.ErrInternalServerError

@@ -13,6 +13,9 @@
       ]
     }
   },
+  "captcha": {
+    "secret": "YOUR_TURNSTILE_SECRET"
+  },
   "db": {
     "username": "YOUR_DB_USERNAME",
     "password": "YOUR_DB_PASSWORD",

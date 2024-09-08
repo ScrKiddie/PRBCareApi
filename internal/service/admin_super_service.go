@@ -20,17 +20,17 @@ import (
 type AdminSuperService struct {
 	DB                   *gorm.DB
 	AdminSuperRepository *repository.AdminSuperRepository
-	RecaptchaAdapter     *adapter.Recaptcha
+	RecaptchaAdapter     *adapter.Captcha
 	Validator            *validator.Validate
 	Config               *viper.Viper
 }
 
 func NewAdminSuperService(db *gorm.DB,
 	adminSuperRepository *repository.AdminSuperRepository,
-	recaptchaAdapter *adapter.Recaptcha,
+	captchaAdapter *adapter.Captcha,
 	validator *validator.Validate,
 	config *viper.Viper) *AdminSuperService {
-	return &AdminSuperService{db, adminSuperRepository, recaptchaAdapter, validator, config}
+	return &AdminSuperService{db, adminSuperRepository, captchaAdapter, validator, config}
 }
 
 func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuperLoginRequest) (*model.AdminSuperResponse, error) {
@@ -42,12 +42,12 @@ func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuper
 		return nil, fiber.ErrBadRequest
 	}
 
-	recaptchaRequest := &model.RecaptchaRequest{
-		TokenRecaptcha: request.TokenRecaptcha,
-		Secret:         s.Config.GetString("recaptcha.secret"),
+	captchaRequest := &model.CaptchaRequest{
+		TokenCaptcha: request.TokenCaptcha,
+		Secret:       s.Config.GetString("captcha.secret"),
 	}
 
-	ok, err := s.RecaptchaAdapter.Verify(recaptchaRequest)
+	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, fiber.ErrInternalServerError

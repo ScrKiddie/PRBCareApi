@@ -35,7 +35,7 @@ func Bootstrap(config *BootstrapConfig) {
 	kontrolBalikRepository := repository.NewKontrolBalikRepository()
 	pengambilanObatRepository := repository.NewPengambilanObatRepository()
 
-	captchaAdapter := adapter.NewRecaptcha(config.Client)
+	captchaAdapter := adapter.NewCaptcha(config.Client)
 
 	adminSuperService := service.NewAdminSuperService(config.DB, adminSuperRepository, captchaAdapter, config.Validate, config.Config)
 	adminPuskesmasService := service.NewAdminPuskesmasService(config.DB, adminPuskesmasRepository, pasienRepository, captchaAdapter, config.Validate, config.Config)

@@ -16,9 +16,12 @@ components:
           type: string
         password:
           type: string
+        tokenCaptcha:
+          type: string
       required:
         - username
         - password
+        - tokenCaptcha
 
     password:
       type: object
@@ -1047,7 +1050,7 @@ paths:
                   type: string
                 password:
                   type: string
-                tokenRecaptcha:
+                tokenCaptcha:
                   type: string
               required:
                 - namaLengkap
@@ -1056,7 +1059,7 @@ paths:
                 - alamat
                 - username
                 - password
-                - tokenRecaptcha
+                - tokenCaptcha
       responses:
         '201':
           description: Pengguna berhasil dibuat
