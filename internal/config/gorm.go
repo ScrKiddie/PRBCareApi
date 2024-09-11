@@ -58,6 +58,7 @@ func Migrate(ctx context.Context, db *gorm.DB) error {
 		&entity.Obat{},
 		&entity.KontrolBalik{},
 		&entity.PengambilanObat{},
+		&entity.Artikel{},
 	}
 
 	for _, e := range entities {

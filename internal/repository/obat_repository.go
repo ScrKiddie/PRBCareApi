@@ -18,7 +18,7 @@ func (r *ObatRepository) FindAll(db *gorm.DB, obat *[]entity.Obat) error {
 	return db.Preload("AdminApotek").Find(obat).Error
 }
 func (r *ObatRepository) FindAllByIdAdminApotek(db *gorm.DB, obat *[]entity.Obat, idAdminApotek int32) error {
-	return db.Where("id_admin_apotek = ?", idAdminApotek).Preload("AdminApotek").Find(obat).Error
+	return db.Where("id_admin_apotek = ?", idAdminApotek).Find(obat).Error
 }
 func (r *ObatRepository) FindById(db *gorm.DB, obat *entity.Obat, id int32) error {
 	return db.Where("id = ?", id).First(obat).Error

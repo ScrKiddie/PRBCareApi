@@ -41,10 +41,10 @@ type KontrolBalikUpdateRequest struct {
 	TinggiBadan      int32  `json:"tinggiBadan" validate:"numeric,gte=0"`
 	TekananDarah     string `json:"tekananDarah" mod:"normalize_spaces" validate:"max=20"`
 	DenyutNadi       int32  `json:"denyutNadi" validate:"numeric,gte=0"`
-	HasilLab         string `json:"hasilLab" mod:"normalize_spaces"`
-	HasilEkg         string `json:"hasilEkg" mod:"normalize_spaces"`
-	HasilDiagnosa    string `json:"hasilDiagnosa" mod:"normalize_spaces"`
-	Keluhan          string `json:"keluhan" mod:"normalize_spaces"`
+	HasilLab         string `json:"hasilLab"`
+	HasilEkg         string `json:"hasilEkg"`
+	HasilDiagnosa    string `json:"hasilDiagnosa"`
+	Keluhan          string `json:"keluhan"`
 }
 type KontrolBalikDeleteRequest struct {
 	ID               int32 `json:"id" validate:"required,numeric"`

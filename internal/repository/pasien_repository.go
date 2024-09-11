@@ -21,14 +21,14 @@ func (r *PasienRepository) Search(db *gorm.DB, pasien *[]entity.Pasien, status s
 	return query.Find(pasien).Error
 }
 func (r *PasienRepository) SearchAsAdminPuskesmas(db *gorm.DB, pasien *[]entity.Pasien, idAdminPuskesmas int32, status string) error {
-	query := db.Where("id_admin_puskesmas = ?", idAdminPuskesmas).Preload("AdminPuskesmas").Preload("Pengguna")
+	query := db.Where("id_admin_puskesmas = ?", idAdminPuskesmas).Preload("Pengguna")
 	if status != "" {
 		query = query.Where("status = ?", status)
 	}
 	return query.Find(pasien).Error
 }
 func (r *PasienRepository) SearchAsPengguna(db *gorm.DB, pasien *[]entity.Pasien, idPengguna int32, status string) error {
-	query := db.Where("id_pengguna = ?", idPengguna).Preload("AdminPuskesmas").Preload("Pengguna")
+	query := db.Where("id_pengguna = ?", idPengguna).Preload("AdminPuskesmas")
 	if status != "" {
 		query = query.Where("status = ?", status)
 	}

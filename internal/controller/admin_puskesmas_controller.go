@@ -169,11 +169,13 @@ func (c *AdminPuskesmasController) Update(ctx fiber.Ctx) error {
 		log.Println("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
-	request.ID = int32(id)
+
 	if err := ctx.Bind().JSON(request); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
+
+	request.ID = int32(id)
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
 		log.Println(err.Error())

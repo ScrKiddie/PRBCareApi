@@ -18,6 +18,7 @@ type Config struct {
 	PasienController          *controller.PasienController
 	KontrolBalikController    *controller.KontrolBalikController
 	PengambilanObatController *controller.PengambilanObatController
+	ArtikelController         *controller.ArtikelController
 	Config                    *viper.Viper
 }
 
@@ -97,6 +98,12 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Delete("/api/pengambilan-obat/:id", c.PengambilanObatController.Delete)
 	c.App.Patch("/api/pengambilan-obat/:id/batal", c.PengambilanObatController.Batal)
 	c.App.Patch("/api/pengambilan-obat/:id/diambil", c.PengambilanObatController.Diambil)
+
+	c.App.Get("/api/artikel", c.ArtikelController.Search)
+	c.App.Get("/api/artikel/:id", c.ArtikelController.Get)
+	c.App.Post("/api/artikel", c.ArtikelController.Create)
+	c.App.Patch("/api/artikel/:id", c.ArtikelController.Update)
+	c.App.Delete("/api/artikel/:id", c.ArtikelController.Delete)
 }
 
 func (c *Config) Setup() {

@@ -26,7 +26,7 @@ func (r *KontrolBalikRepository) SearchAsAdminPuskesmas(db *gorm.DB, kontrolBali
 	if status != "" {
 		query = query.Where("kontrol_balik.status = ?", status)
 	}
-	return query.Preload("Pasien.AdminPuskesmas").Preload("Pasien.Pengguna").Find(&kontrolBalik).Error
+	return query.Preload("Pasien.Pengguna").Find(&kontrolBalik).Error
 }
 func (r *KontrolBalikRepository) SearchAsPengguna(db *gorm.DB, kontrolBalik *[]entity.KontrolBalik, idPengguna int32, status string) error {
 	query := db.Joins("JOIN pasien ON pasien.id = kontrol_balik.id_pasien").
@@ -34,7 +34,7 @@ func (r *KontrolBalikRepository) SearchAsPengguna(db *gorm.DB, kontrolBalik *[]e
 	if status != "" {
 		query = query.Where("kontrol_balik.status = ?", status)
 	}
-	return query.Preload("Pasien.AdminPuskesmas").Preload("Pasien.Pengguna").Find(&kontrolBalik).Error
+	return query.Preload("Pasien.AdminPuskesmas").Find(&kontrolBalik).Error
 }
 func (r *KontrolBalikRepository) FindByIdAndStatus(db *gorm.DB, kontrolBalik *entity.KontrolBalik, id int32, status string) error {
 	return db.Where("id = ?", id).

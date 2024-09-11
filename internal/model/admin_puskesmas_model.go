@@ -24,8 +24,8 @@ type AdminPuskesmasProfileUpdateRequest struct {
 	ID               int32  `json:"id" validate:"required,numeric"`
 	NamaPuskesmas    string `json:"namaPuskesmas" mod:"normalize_spaces" validate:"required,min=3,max=50"`
 	Telepon          string `json:"telepon" validate:"required,min=10,max=16,not_contain_space"`
-	Alamat           string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3"`
-	WaktuOperasional string `json:"waktuOperasional" mod:"normalize_spaces" validate:"required,min=3"`
+	Alamat           string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3,max=1000"`
+	WaktuOperasional string `json:"waktuOperasional" mod:"normalize_spaces" validate:"required,min=3,max=1000"`
 }
 type AdminPuskesmasVerifyRequest struct {
 	ID int32 `validate:"required,numeric"`
@@ -36,8 +36,8 @@ type AdminPuskesmasGetRequest struct {
 type AdminPuskesmasCreateRequest struct {
 	NamaPuskesmas    string `json:"namaPuskesmas" mod:"normalize_spaces" validate:"required,min=3,max=50"`
 	Telepon          string `json:"telepon" validate:"required,min=10,max=16,not_contain_space"`
-	Alamat           string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3"`
-	WaktuOperasional string `json:"waktuOperasional" mod:"normalize_spaces" validate:"required,min=3"`
+	Alamat           string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3,max=1000"`
+	WaktuOperasional string `json:"waktuOperasional" mod:"normalize_spaces" validate:"required,min=3,max=1000"`
 	Username         string `json:"username" validate:"required,min=6,max=50,not_contain_space"`
 	Password         string `json:"password" validate:"required,min=6,max=255,is_password_format,not_contain_space"`
 }
@@ -45,8 +45,8 @@ type AdminPuskesmasUpdateRequest struct {
 	ID               int32  `json:"id" validate:"required,numeric"`
 	NamaPuskesmas    string `json:"namaPuskesmas" mod:"normalize_spaces" validate:"required,min=3,max=50"`
 	Telepon          string `json:"telepon" validate:"required,min=10,max=16,not_contain_space"`
-	Alamat           string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3"`
-	WaktuOperasional string `json:"waktuOperasional" mod:"normalize_spaces" validate:"required,min=3"`
+	Alamat           string `json:"alamat" mod:"normalize_spaces" validate:"required,min=3,max=1000"`
+	WaktuOperasional string `json:"waktuOperasional" mod:"normalize_spaces" validate:"required,min=3,max=1000"`
 	Username         string `json:"username" validate:"required,min=6,max=50,not_contain_space"`
 	Password         string `json:"password" validate:"omitempty,min=6,max=255,is_password_format,not_contain_space"`
 }

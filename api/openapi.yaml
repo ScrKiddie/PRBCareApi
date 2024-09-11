@@ -166,7 +166,8 @@ tags:
     description: Operasi yang berhubungan dengan kontrol balik pasien
   - name: Pengambilan Obat
     description: Operasi yang berhubungan dengan pengambilan obat
-
+  - name: Artikel
+    description: Operasi yang berhubungan dengan artikel
 paths:
   /api/admin-super/login:
     post:
@@ -2664,6 +2665,229 @@ paths:
                   data:
                     type: string
                     example: Token perangkat pengguna berhasil diupdate
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/artikel:
+    get:
+      tags:
+        - Artikel
+      summary: Get all artikel
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: query
+          name: idAdminPuskesmas
+          schema:
+            type: integer
+          description: Filter artikel by id admin puskesmas
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        adminPuskesmas:
+                          $ref: '#/components/schemas/get_puskesmas'
+                        judul:
+                          type: string
+                        isi:
+                          type: string
+                        tanggalPublikasi:
+                          type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Artikel
+      summary: Create new artikel
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idAdminPuskesmas:
+                  type: integer
+                judul:
+                  type: string
+                ringkasan:
+                  type: string
+                isi:
+                  type: string
+              required:
+                - judul
+                - ringkasan
+                - isi
+      responses:
+        '201':
+          description: Artikel berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Artikel berhasil dibuat
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/artikel/{id}:
+    get:
+      tags:
+        - Artikel
+      summary: Get artikel by id
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      adminPuskesmas:
+                        $ref: '#/components/schemas/get_puskesmas'
+                      judul:
+                        type: string
+                      ringkasan:
+                        type: string
+                      tanggalPublikasi:
+                        type: integer
+
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Artikel
+      summary: Update pasien aktif
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idAdminPuskesmas:
+                  type: integer
+                judul:
+                  type: string
+                ringkasan:
+                  type: string
+                isi:
+                  type: string
+              required:
+                - judul
+                - ringkasan
+                - isi
+                - idAdminPuskesmas
+      responses:
+        '200':
+          description: Artikel berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Artikel berhasil diupdate
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Artikel
+      summary: Delete artikel
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Artikel berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Artikel berhasil dihapus
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':

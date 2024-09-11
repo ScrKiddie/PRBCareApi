@@ -101,11 +101,14 @@ func (c *PengambilanObatController) Update(ctx fiber.Ctx) error {
 		log.Println("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
-	request.ID = int32(id)
+
 	if err := ctx.Bind().JSON(request); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
+
+	request.ID = int32(id)
+
 	if auth.Role == constant.RoleAdminPuskesmas {
 		request.IdAdminPuskesmas = auth.ID
 	}

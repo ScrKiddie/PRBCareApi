@@ -34,6 +34,7 @@ func Bootstrap(config *BootstrapConfig) {
 	pasienRepository := repository.NewPasienRepository()
 	kontrolBalikRepository := repository.NewKontrolBalikRepository()
 	pengambilanObatRepository := repository.NewPengambilanObatRepository()
+	artikelRepository := repository.NewArtikelRepository()
 
 	captchaAdapter := adapter.NewCaptcha(config.Client)
 
@@ -45,6 +46,7 @@ func Bootstrap(config *BootstrapConfig) {
 	pasienService := service.NewPasienService(config.DB, pasienRepository, adminPuskesmasRepository, penggunaRepository, kontrolBalikRepository, pengambilanObatRepository, config.Validate)
 	kontrolBalikService := service.NewKontrolBalikService(config.DB, kontrolBalikRepository, pasienRepository, config.Validate)
 	pengambilanObatService := service.NewPengambilanObatService(config.DB, pengambilanObatRepository, pasienRepository, obatRepository, config.Validate)
+	artikelSevice := service.NewArtikelService(config.DB, artikelRepository, adminPuskesmasRepository, config.Validate)
 
 	adminSuperController := controller.NewAdminSuperController(adminSuperService)
 	adminPuskesmasController := controller.NewAdminPuskesmasController(adminPuskesmasService, config.Modifier)
@@ -52,8 +54,9 @@ func Bootstrap(config *BootstrapConfig) {
 	penggunaController := controller.NewPenggunaController(penggunaService, config.Modifier)
 	obatController := controller.NewObatController(obatService, config.Modifier)
 	pasienController := controller.NewPasienController(pasienService, config.Modifier)
-	kontrolBalikController := controller.NewKontrolBalikController(kontrolBalikService)
+	kontrolBalikController := controller.NewKontrolBalikController(kontrolBalikService, config.Modifier)
 	pengambilanObatController := controller.NewPengambilanObatController(pengambilanObatService)
+	artikelController := controller.NewArtikelController(artikelSevice, config.Modifier)
 
 	authMiddleware := middleware.AuthMiddleware(config.Config, adminSuperService, adminPuskesmasService, adminApotekService, penggunaService)
 
@@ -68,6 +71,7 @@ func Bootstrap(config *BootstrapConfig) {
 		PasienController:          pasienController,
 		KontrolBalikController:    kontrolBalikController,
 		PengambilanObatController: pengambilanObatController,
+		ArtikelController:         artikelController,
 		Config:                    config.Config,
 	}
 	route.Setup()

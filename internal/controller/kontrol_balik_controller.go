@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/go-playground/mold/v4"
 	"github.com/gofiber/fiber/v3"
 	"log"
 	"math"
@@ -13,10 +14,11 @@ import (
 
 type KontrolBalikController struct {
 	KontrolBalikService *service.KontrolBalikService
+	Modifier            *mold.Transformer
 }
 
-func NewKontrolBalikController(kontrolBalikService *service.KontrolBalikService) *KontrolBalikController {
-	return &KontrolBalikController{kontrolBalikService}
+func NewKontrolBalikController(kontrolBalikService *service.KontrolBalikService, modifier *mold.Transformer) *KontrolBalikController {
+	return &KontrolBalikController{kontrolBalikService, modifier}
 }
 
 func (c *KontrolBalikController) Search(ctx fiber.Ctx) error {
@@ -101,11 +103,19 @@ func (c *KontrolBalikController) Update(ctx fiber.Ctx) error {
 		log.Println("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
-	request.ID = int32(id)
+
 	if err := ctx.Bind().JSON(request); err != nil {
 		log.Println(err.Error())
 		return fiber.ErrBadRequest
 	}
+
+	request.ID = int32(id)
+
+	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
+		log.Println(err.Error())
+		return fiber.ErrInternalServerError
+	}
+
 	if auth.Role == constant.RoleAdminPuskesmas {
 		request.IdAdminPuskesmas = auth.ID
 	}
