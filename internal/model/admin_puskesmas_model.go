@@ -31,7 +31,7 @@ type AdminPuskesmasVerifyRequest struct {
 	ID int32 `validate:"required,numeric"`
 }
 type AdminPuskesmasGetRequest struct {
-	ID int32 `json:"id" validate:"required,numeric"`
+	ID int32 `validate:"required,numeric"`
 }
 type AdminPuskesmasCreateRequest struct {
 	NamaPuskesmas    string `json:"namaPuskesmas" mod:"normalize_spaces" validate:"required,min=3,max=50"`

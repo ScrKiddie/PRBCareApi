@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
@@ -38,7 +38,7 @@ func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuper
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
@@ -49,7 +49,7 @@ func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuper
 
 	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 	if !ok {
@@ -58,12 +58,12 @@ func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuper
 
 	adminSuper := new(entity.AdminSuper)
 	if err := s.AdminSuperRepository.FindByUsername(tx, adminSuper, request.Username); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(adminSuper.Password), []byte(request.Password)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
@@ -77,12 +77,12 @@ func (s *AdminSuperService) Login(ctx context.Context, request *model.AdminSuper
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(key))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -94,35 +94,35 @@ func (s *AdminSuperService) PasswordUpdate(ctx context.Context, request *model.A
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminSuper := new(entity.AdminSuper)
 	if err := s.AdminSuperRepository.FindById(tx, adminSuper, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(adminSuper.Password), []byte(request.CurrentPassword)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.NewError(fiber.StatusUnauthorized, "Password saat ini salah")
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	adminSuper.Password = string(password)
 
 	if err := s.AdminSuperRepository.Update(tx, adminSuper); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -134,18 +134,18 @@ func (s *AdminSuperService) Verify(ctx context.Context, request *model.AdminSupe
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminSuper := new(entity.AdminSuper)
 	if err := s.AdminSuperRepository.FindById(tx, adminSuper, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

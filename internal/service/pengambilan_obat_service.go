@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -36,29 +36,29 @@ func (s *PengambilanObatService) Search(ctx context.Context, request *model.Peng
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	pengambilanObat := new([]entity.PengambilanObat)
 	if request.IdPengguna > 0 {
 		if err := s.PengambilanObatRepository.SearchAsPengguna(tx, pengambilanObat, request.IdPengguna, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.SearchAsAdminPuskesmas(tx, pengambilanObat, request.IdAdminPuskesmas, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else if request.IdAdminApotek > 0 {
 		if err := s.PengambilanObatRepository.SearchAsAdminApotek(tx, pengambilanObat, request.IdAdminApotek, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else {
 		if err := s.PengambilanObatRepository.Search(tx, pengambilanObat, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	}
@@ -107,7 +107,7 @@ func (s *PengambilanObatService) Search(ctx context.Context, request *model.Peng
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -119,23 +119,23 @@ func (s *PengambilanObatService) Get(ctx context.Context, request *model.Pengamb
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrNotFound
 		}
 	} else if err := s.PengambilanObatRepository.FindByIdAndStatus(tx, pengambilanObat, request.ID, constant.StatusPengambilanObatMenunggu); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -153,25 +153,25 @@ func (s *PengambilanObatService) Create(ctx context.Context, request *model.Peng
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, &entity.Pasien{}, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PasienRepository.FindByIdAndStatus(tx, &entity.Pasien{}, request.IdPasien, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	obat := new(entity.Obat)
 	if err := s.ObatRepository.FindByIdAndLockForUpdate(tx, obat, request.IdObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 	obat.Jumlah -= request.Jumlah
@@ -188,17 +188,17 @@ func (s *PengambilanObatService) Create(ctx context.Context, request *model.Peng
 	pengambilanObat.Status = constant.StatusPengambilanObatMenunggu
 
 	if err := s.ObatRepository.Update(tx, obat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := s.PengambilanObatRepository.Create(tx, pengambilanObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -210,38 +210,38 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PengambilanObatRepository.FindByIdAndStatus(tx, pengambilanObat, request.ID, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, &entity.Pasien{}, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PasienRepository.FindByIdAndStatus(tx, &entity.Pasien{}, request.IdPasien, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	obatNew := new(entity.Obat)
 	if err := s.ObatRepository.FindByIdAndLockForUpdate(tx, obatNew, request.IdObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -253,7 +253,7 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 		}
 	} else {
 		if err := s.ObatRepository.FindByIdAndLockForUpdate(tx, obatOld, pengambilanObat.IdObat); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 		obatOld.Jumlah += pengambilanObat.Jumlah
@@ -262,13 +262,13 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 			return fiber.NewError(fiber.StatusConflict, "Jumlah obat melebihi persediaan apotek")
 		}
 		if err := s.ObatRepository.Update(tx, obatOld); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrInternalServerError
 		}
 	}
 
 	if err := s.ObatRepository.Update(tx, obatNew); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -279,12 +279,12 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 	pengambilanObat.TanggalPengambilan = request.TanggalPengambilan
 
 	if err := s.PengambilanObatRepository.Update(tx, pengambilanObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -296,30 +296,30 @@ func (s *PengambilanObatService) Delete(ctx context.Context, request *model.Peng
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatusOrStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatBatal, constant.StatusPengambilanObatDiambil); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PengambilanObatRepository.FindByIdAndStatusOrStatus(tx, pengambilanObat, request.ID, constant.StatusPengambilanObatBatal, constant.StatusPengambilanObatDiambil); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	if err := s.PengambilanObatRepository.Delete(tx, pengambilanObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -331,25 +331,25 @@ func (s *PengambilanObatService) Batal(ctx context.Context, request *model.Penga
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pengambilanObat, request.ID, request.IdAdminPuskesmas, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PengambilanObatRepository.FindByIdAndStatus(tx, pengambilanObat, request.ID, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 	obat := new(entity.Obat)
 	if err := s.ObatRepository.FindByIdAndLockForUpdate(tx, obat, pengambilanObat.IdObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 	obat.Jumlah += pengambilanObat.Jumlah
@@ -357,17 +357,17 @@ func (s *PengambilanObatService) Batal(ctx context.Context, request *model.Penga
 	pengambilanObat.Status = constant.StatusPengambilanObatBatal
 
 	if err := s.ObatRepository.Update(tx, obat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := s.PengambilanObatRepository.Update(tx, pengambilanObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -379,19 +379,19 @@ func (s *PengambilanObatService) Diambil(ctx context.Context, request *model.Pen
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengambilanObat := new(entity.PengambilanObat)
 	if request.IdAdminApotek > 0 {
 		if err := s.PengambilanObatRepository.FindByIdAndIdAdminApotekAndStatus(tx, pengambilanObat, request.ID, request.IdAdminApotek, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PengambilanObatRepository.FindByIdAndStatus(tx, pengambilanObat, request.ID, constant.StatusPengambilanObatMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
@@ -399,12 +399,12 @@ func (s *PengambilanObatService) Diambil(ctx context.Context, request *model.Pen
 	pengambilanObat.Status = constant.StatusPengambilanObatDiambil
 
 	if err := s.PengambilanObatRepository.Update(tx, pengambilanObat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

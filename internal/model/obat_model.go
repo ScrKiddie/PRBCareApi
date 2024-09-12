@@ -12,7 +12,7 @@ type ObatListRequest struct {
 	IdAdminApotek int32 `validate:"omitempty,numeric"`
 }
 type ObatGetRequest struct {
-	ID            int32 `json:"id" validate:"required,numeric"`
+	ID            int32 `validate:"required,numeric"`
 	IdAdminApotek int32 `validate:"omitempty,numeric"`
 }
 type ObatCreateRequest struct {

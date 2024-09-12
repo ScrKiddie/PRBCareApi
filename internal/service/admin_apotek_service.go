@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
@@ -46,7 +46,7 @@ func (s *AdminApotekService) List(ctx context.Context) (*[]model.AdminApotekResp
 
 	adminApotek := new([]entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindAll(tx, adminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -62,7 +62,7 @@ func (s *AdminApotekService) List(ctx context.Context) (*[]model.AdminApotekResp
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -74,18 +74,18 @@ func (s *AdminApotekService) Get(ctx context.Context, request *model.AdminApotek
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -105,13 +105,13 @@ func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApo
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	total, err := s.AdminApotekRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -120,7 +120,7 @@ func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApo
 
 	total, err = s.AdminApotekRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -129,7 +129,7 @@ func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApo
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -142,12 +142,12 @@ func (s *AdminApotekService) Create(ctx context.Context, request *model.AdminApo
 	adminApotek.Password = string(password)
 
 	if err := s.AdminApotekRepository.Create(tx, adminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -159,19 +159,19 @@ func (s *AdminApotekService) Update(ctx context.Context, request *model.AdminApo
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	total, err := s.AdminApotekRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && adminApotek.Username != request.Username {
@@ -180,7 +180,7 @@ func (s *AdminApotekService) Update(ctx context.Context, request *model.AdminApo
 
 	total, err = s.AdminApotekRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && adminApotek.Telepon != request.Telepon {
@@ -191,7 +191,7 @@ func (s *AdminApotekService) Update(ctx context.Context, request *model.AdminApo
 	if request.Password != "" {
 		password, err = bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 		if err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrInternalServerError
 		}
 	}
@@ -206,12 +206,12 @@ func (s *AdminApotekService) Update(ctx context.Context, request *model.AdminApo
 	}
 
 	if err := s.AdminApotekRepository.Update(tx, adminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -223,13 +223,13 @@ func (s *AdminApotekService) Delete(ctx context.Context, request *model.AdminApo
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -238,12 +238,12 @@ func (s *AdminApotekService) Delete(ctx context.Context, request *model.AdminApo
 	}
 
 	if err := s.AdminApotekRepository.Delete(tx, adminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -255,7 +255,7 @@ func (s *AdminApotekService) Login(ctx context.Context, request *model.AdminApot
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
@@ -266,7 +266,7 @@ func (s *AdminApotekService) Login(ctx context.Context, request *model.AdminApot
 
 	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 	if !ok {
@@ -275,12 +275,12 @@ func (s *AdminApotekService) Login(ctx context.Context, request *model.AdminApot
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindByUsername(tx, adminApotek, request.Username); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(adminApotek.Password), []byte(request.Password)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
@@ -294,12 +294,12 @@ func (s *AdminApotekService) Login(ctx context.Context, request *model.AdminApot
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(key))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -311,18 +311,18 @@ func (s *AdminApotekService) Verify(ctx context.Context, request *model.AdminApo
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -334,18 +334,18 @@ func (s *AdminApotekService) Current(ctx context.Context, request *model.AdminAp
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -363,19 +363,19 @@ func (s *AdminApotekService) CurrentProfileUpdate(ctx context.Context, request *
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	total, err := s.AdminApotekRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && adminApotek.Telepon != request.Telepon {
@@ -388,12 +388,12 @@ func (s *AdminApotekService) CurrentProfileUpdate(ctx context.Context, request *
 	adminApotek.Telepon = request.Telepon
 
 	if err := s.AdminApotekRepository.Update(tx, adminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -405,35 +405,35 @@ func (s *AdminApotekService) CurrentPasswordUpdate(ctx context.Context, request 
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminApotek := new(entity.AdminApotek)
 	if err := s.AdminApotekRepository.FindById(tx, adminApotek, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(adminApotek.Password), []byte(request.CurrentPassword)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.NewError(fiber.StatusUnauthorized, "Password saat ini salah")
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	adminApotek.Password = string(password)
 
 	if err := s.AdminApotekRepository.Update(tx, adminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

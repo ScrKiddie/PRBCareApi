@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"log"
+	"log/slog"
 	"math"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/middleware"
@@ -33,7 +33,7 @@ func (c *PengambilanObatController) Search(ctx fiber.Ctx) error {
 	request.Status = ctx.Query("status")
 	response, err := c.PengambilanObatService.Search(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"data": response})
@@ -50,17 +50,17 @@ func (c *PengambilanObatController) Get(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	response, err := c.PengambilanObatService.Get(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"data": response})
@@ -73,14 +73,14 @@ func (c *PengambilanObatController) Create(ctx fiber.Ctx) error {
 	}
 	request := new(model.PengambilanObatCreateRequest)
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if auth.Role == constant.RoleAdminPuskesmas {
 		request.IdAdminPuskesmas = auth.ID
 	}
 	if err := c.PengambilanObatService.Create(ctx.Context(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"data": "Pengambilan obat berhasil dibuat"})
@@ -94,16 +94,16 @@ func (c *PengambilanObatController) Update(ctx fiber.Ctx) error {
 	request := new(model.PengambilanObatUpdateRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -113,7 +113,7 @@ func (c *PengambilanObatController) Update(ctx fiber.Ctx) error {
 		request.IdAdminPuskesmas = auth.ID
 	}
 	if err := c.PengambilanObatService.Update(ctx.Context(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"data": "Pengambilan obat berhasil diperbarui"})
@@ -130,16 +130,16 @@ func (c *PengambilanObatController) Delete(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	if err := c.PengambilanObatService.Delete(ctx.Context(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"data": "Pengambilan obat berhasil dihapus"})
@@ -156,16 +156,16 @@ func (c *PengambilanObatController) Batal(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	if err := c.PengambilanObatService.Batal(ctx.Context(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"data": "Pengambilan obat berhasil ditandai batal"})
@@ -182,16 +182,16 @@ func (c *PengambilanObatController) Diambil(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	if err := c.PengambilanObatService.Diambil(ctx.Context(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"data": "Pengambilan obat berhasil ditandai selesai"})

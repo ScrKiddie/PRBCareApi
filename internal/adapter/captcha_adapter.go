@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"github.com/gofiber/fiber/v3/client"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/model"
 )
 
@@ -33,7 +33,7 @@ func (r *Captcha) Verify(request *model.CaptchaRequest) (bool, error) {
 	}
 
 	if !response.Success {
-		log.Println(string(resp.Body()))
+		slog.Info(string(resp.Body()))
 	}
 	return response.Success, nil
 }

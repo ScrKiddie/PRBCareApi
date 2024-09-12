@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/go-playground/mold/v4"
 	"github.com/gofiber/fiber/v3"
-	"log"
+	"log/slog"
 	"math"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/middleware"
@@ -31,7 +31,7 @@ func (c *ObatController) List(ctx fiber.Ctx) error {
 	}
 	response, err := c.ObatService.List(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -49,17 +49,17 @@ func (c *ObatController) Get(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	response, err := c.ObatService.Get(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -74,7 +74,7 @@ func (c *ObatController) Create(ctx fiber.Ctx) error {
 	request := new(model.ObatCreateRequest)
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -83,12 +83,12 @@ func (c *ObatController) Create(ctx fiber.Ctx) error {
 	}
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := c.ObatService.Create(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -103,16 +103,16 @@ func (c *ObatController) Update(ctx fiber.Ctx) error {
 	request := new(model.ObatUpdateRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -124,12 +124,12 @@ func (c *ObatController) Update(ctx fiber.Ctx) error {
 	}
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := c.ObatService.Update(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -147,17 +147,17 @@ func (c *ObatController) Delete(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 
 	if err := c.ObatService.Delete(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 

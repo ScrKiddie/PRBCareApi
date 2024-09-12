@@ -5,7 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -33,24 +33,24 @@ func (s *KontrolBalikService) Search(ctx context.Context, request *model.Kontrol
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	kontrolBalik := new([]entity.KontrolBalik)
 	if request.IdPengguna > 0 {
 		if err := s.KontrolBalikRepository.SearchAsPengguna(tx, kontrolBalik, request.IdPengguna, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.SearchAsAdminPuskesmas(tx, kontrolBalik, request.IdAdminPuskesmas, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else {
 		if err := s.KontrolBalikRepository.Search(tx, kontrolBalik, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	}
@@ -94,7 +94,7 @@ func (s *KontrolBalikService) Search(ctx context.Context, request *model.Kontrol
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -106,23 +106,23 @@ func (s *KontrolBalikService) Get(ctx context.Context, request *model.KontrolBal
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrNotFound
 		}
 	} else if err := s.KontrolBalikRepository.FindByIdAndStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikMenunggu); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -147,26 +147,26 @@ func (s *KontrolBalikService) Create(ctx context.Context, request *model.Kontrol
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.IdPasien, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	noAntrean, err := s.KontrolBalikRepository.FindMaksNoAntreanByTanggalKontrolAndIdAdminPuskesmasAndStatus(tx, request.TanggalKontrol, pasien.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -177,12 +177,12 @@ func (s *KontrolBalikService) Create(ctx context.Context, request *model.Kontrol
 	kontrolBalik.Status = constant.StatusKontrolBalikMenunggu
 
 	if err := s.KontrolBalikRepository.Create(tx, kontrolBalik); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -194,38 +194,38 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.KontrolBalikRepository.FindByIdAndStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.IdPasien, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	total, err := s.KontrolBalikRepository.CountByNoAntreanAndTanggalKontrolAndIdAdminPuskesmasAndStatus(tx, request.NoAntrean, request.TanggalKontrol, pasien.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && kontrolBalik.NoAntrean != request.NoAntrean {
@@ -245,12 +245,12 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 	kontrolBalik.TanggalKontrol = request.TanggalKontrol
 
 	if err := s.KontrolBalikRepository.Update(tx, kontrolBalik); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -262,30 +262,30 @@ func (s *KontrolBalikService) Delete(ctx context.Context, request *model.Kontrol
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusOrStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal, constant.StatusKontrolBalikSelesai); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.KontrolBalikRepository.FindByIdAndStatusOrStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal, constant.StatusKontrolBalikSelesai); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	if err := s.KontrolBalikRepository.Delete(tx, kontrolBalik); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -297,19 +297,19 @@ func (s *KontrolBalikService) Batal(ctx context.Context, request *model.KontrolB
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.KontrolBalikRepository.FindByIdAndStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
@@ -317,12 +317,12 @@ func (s *KontrolBalikService) Batal(ctx context.Context, request *model.KontrolB
 	kontrolBalik.Status = constant.StatusKontrolBalikBatal
 
 	if err := s.KontrolBalikRepository.Update(tx, kontrolBalik); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -334,19 +334,19 @@ func (s *KontrolBalikService) Selesai(ctx context.Context, request *model.Kontro
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.KontrolBalikRepository.FindByIdAndStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikMenunggu); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
@@ -354,12 +354,12 @@ func (s *KontrolBalikService) Selesai(ctx context.Context, request *model.Kontro
 	kontrolBalik.Status = constant.StatusKontrolBalikSelesai
 
 	if err := s.KontrolBalikRepository.Update(tx, kontrolBalik); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

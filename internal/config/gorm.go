@@ -3,11 +3,13 @@ package config
 import (
 	"context"
 	"fmt"
+	slogGorm "github.com/orandin/slog-gorm"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
 	"prb_care_api/internal/entity"
+	"time"
 )
 
 func NewDatabase(config *viper.Viper) *gorm.DB {
@@ -19,7 +21,13 @@ func NewDatabase(config *viper.Viper) *gorm.DB {
 
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable&lock_timeout=5000", username, password, host, port, database)
 
-	db, err := gorm.Open(postgres.Open(dsn))
+	logger := slogGorm.New(
+		slogGorm.WithRecordNotFoundError(),
+		slogGorm.WithSlowThreshold(500*time.Millisecond),
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger})
 	if err != nil {
 		log.Fatalln(err)
 	}

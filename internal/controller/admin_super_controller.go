@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/middleware"
 	"prb_care_api/internal/model"
@@ -20,12 +20,12 @@ func NewAdminSuperController(adminSuperService *service.AdminSuperService) *Admi
 func (c *AdminSuperController) Login(ctx fiber.Ctx) error {
 	request := new(model.AdminSuperLoginRequest)
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	response, err := c.AdminSuperService.Login(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -40,11 +40,11 @@ func (c *AdminSuperController) PasswordUpdate(ctx fiber.Ctx) error {
 	request := new(model.AdminSuperPasswordUpdateRequest)
 	request.ID = auth.ID
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if err := c.AdminSuperService.PasswordUpdate(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{

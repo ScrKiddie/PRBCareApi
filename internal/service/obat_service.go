@@ -5,7 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
 	"prb_care_api/internal/repository"
@@ -33,7 +33,7 @@ func (s *ObatService) List(ctx context.Context, request *model.ObatListRequest) 
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
@@ -41,11 +41,11 @@ func (s *ObatService) List(ctx context.Context, request *model.ObatListRequest) 
 
 	if request.IdAdminApotek > 0 {
 		if err := s.ObatRepository.FindAllByIdAdminApotek(tx, obat, request.IdAdminApotek); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else if err := s.ObatRepository.FindAll(tx, obat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -66,7 +66,7 @@ func (s *ObatService) List(ctx context.Context, request *model.ObatListRequest) 
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -78,23 +78,23 @@ func (s *ObatService) Get(ctx context.Context, request *model.ObatGetRequest) (*
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	obat := new(entity.Obat)
 	if request.IdAdminApotek > 0 {
 		if err := s.ObatRepository.FindByIdAndIdAdminApotek(tx, obat, request.ID, request.IdAdminApotek); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrNotFound
 		}
 	} else if err := s.ObatRepository.FindById(tx, obat, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -112,12 +112,12 @@ func (s *ObatService) Create(ctx context.Context, request *model.ObatCreateReque
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if err := s.AdminApotekRepository.FindById(tx, &entity.AdminApotek{}, request.IdAdminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -127,12 +127,12 @@ func (s *ObatService) Create(ctx context.Context, request *model.ObatCreateReque
 	obatEnity.Jumlah = request.Jumlah
 
 	if err := s.ObatRepository.Create(tx, obatEnity); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -144,23 +144,23 @@ func (s *ObatService) Update(ctx context.Context, request *model.ObatUpdateReque
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if err := s.AdminApotekRepository.FindById(tx, &entity.AdminApotek{}, request.IdAdminApotek); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	obat := new(entity.Obat)
 	if request.CurrentAdminApotek {
 		if err := s.ObatRepository.FindByIdAndIdAdminApotekAndLockForUpdate(tx, obat, request.ID, request.IdAdminApotek); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else if err := s.ObatRepository.FindByIdAndLockForUpdate(tx, obat, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -169,12 +169,12 @@ func (s *ObatService) Update(ctx context.Context, request *model.ObatUpdateReque
 	obat.Jumlah = request.Jumlah
 
 	if err := s.ObatRepository.Update(tx, obat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -186,18 +186,18 @@ func (s *ObatService) Delete(ctx context.Context, request *model.ObatDeleteReque
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	obat := new(entity.Obat)
 	if request.IdAdminApotek > 0 {
 		if err := s.ObatRepository.FindByIdAndIdAdminApotek(tx, obat, request.ID, request.IdAdminApotek); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else if err := s.ObatRepository.FindById(tx, obat, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -206,12 +206,12 @@ func (s *ObatService) Delete(ctx context.Context, request *model.ObatDeleteReque
 	}
 
 	if err := s.ObatRepository.Delete(tx, obat); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

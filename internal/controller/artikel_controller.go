@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/go-playground/mold/v4"
 	"github.com/gofiber/fiber/v3"
-	"log"
+	"log/slog"
 	"math"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/middleware"
@@ -28,11 +28,11 @@ func (c *ArtikelController) Get(ctx fiber.Ctx) error {
 	param := ctx.Params("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request := new(model.ArtikelGetRequest)
@@ -40,7 +40,7 @@ func (c *ArtikelController) Get(ctx fiber.Ctx) error {
 
 	response, err := c.ArtikelService.Get(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -55,11 +55,11 @@ func (c *ArtikelController) Search(ctx fiber.Ctx) error {
 	if param != "" {
 		idAdminPuskesmas, err := strconv.Atoi(param)
 		if err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrBadRequest
 		}
 		if idAdminPuskesmas < math.MinInt32 || idAdminPuskesmas > math.MaxInt32 {
-			log.Println("value out of range for int32")
+			slog.Error("value out of range for int32")
 			return fiber.ErrBadRequest
 		}
 		request.IdAdminPuskesmas = int32(idAdminPuskesmas)
@@ -67,7 +67,7 @@ func (c *ArtikelController) Search(ctx fiber.Ctx) error {
 
 	response, err := c.ArtikelService.Search(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -84,7 +84,7 @@ func (c *ArtikelController) Create(ctx fiber.Ctx) error {
 
 	request := new(model.ArtikelCreateRequest)
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -92,12 +92,12 @@ func (c *ArtikelController) Create(ctx fiber.Ctx) error {
 		request.IdAdminPuskesmas = auth.ID
 	}
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	err := c.ArtikelService.Create(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -112,24 +112,24 @@ func (c *ArtikelController) Update(ctx fiber.Ctx) error {
 
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 
 	request := new(model.ArtikelUpdateRequest)
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	request.ID = int32(id)
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -140,7 +140,7 @@ func (c *ArtikelController) Update(ctx fiber.Ctx) error {
 
 	err = c.ArtikelService.Update(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -156,11 +156,11 @@ func (c *ArtikelController) Delete(ctx fiber.Ctx) error {
 	request := new(model.ArtikelDeleteRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
@@ -171,7 +171,7 @@ func (c *ArtikelController) Delete(ctx fiber.Ctx) error {
 
 	err = c.ArtikelService.Delete(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 

@@ -2797,6 +2797,8 @@ paths:
                         type: string
                       ringkasan:
                         type: string
+                      isi:
+                        type: string
                       tanggalPublikasi:
                         type: integer
 

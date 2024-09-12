@@ -11,10 +11,10 @@ type ArtikelResponse struct {
 }
 
 type ArtikelGetRequest struct {
-	ID int32 `json:"id" validate:"required,numeric"`
+	ID int32 `validate:"required,numeric"`
 }
 type ArtikelSearchRequest struct {
-	IdAdminPuskesmas int32 `validate:"omitempty,numeric"`
+	IdAdminPuskesmas int32 `validate:"omitempty,numeric,gte=0"`
 }
 type ArtikelCreateRequest struct {
 	Judul            string `json:"judul" mod:"normalize_spaces" validate:"required,max=255"`

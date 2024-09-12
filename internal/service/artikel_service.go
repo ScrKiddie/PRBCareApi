@@ -5,7 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
 	"prb_care_api/internal/repository"
@@ -37,9 +37,14 @@ func (s *ArtikelService) Search(ctx context.Context, request *model.ArtikelSearc
 	tx := s.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
+	if err := s.Validator.Struct(request); err != nil {
+		slog.Error(err.Error())
+		return nil, fiber.ErrBadRequest
+	}
+
 	artikel := new([]entity.Artikel)
 	if err := s.ArtikelRepository.Search(tx, artikel, request.IdAdminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -61,7 +66,7 @@ func (s *ArtikelService) Search(ctx context.Context, request *model.ArtikelSearc
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -72,15 +77,21 @@ func (s *ArtikelService) Get(ctx context.Context, request *model.ArtikelGetReque
 	tx := s.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
+	if err := s.Validator.Struct(request); err != nil {
+		slog.Error(err.Error())
+		return nil, fiber.ErrBadRequest
+	}
+
 	artikel := new(entity.Artikel)
 	if err := s.ArtikelRepository.FindById(tx, artikel, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	response := &model.ArtikelResponse{
 		ID:               artikel.ID,
 		Judul:            artikel.Judul,
+		Ringkasan:        artikel.Ringkasan,
 		Isi:              artikel.Isi,
 		TanggalPublikasi: artikel.TanggalPublikasi,
 		AdminPuskesmas: &model.AdminPuskesmasResponse{
@@ -93,7 +104,7 @@ func (s *ArtikelService) Get(ctx context.Context, request *model.ArtikelGetReque
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -105,12 +116,12 @@ func (s *ArtikelService) Create(ctx context.Context, request *model.ArtikelCreat
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if err := s.AdminPuskesmasRepository.FindById(tx, &entity.AdminPuskesmas{}, request.IdAdminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -123,12 +134,12 @@ func (s *ArtikelService) Create(ctx context.Context, request *model.ArtikelCreat
 	}
 
 	if err := s.ArtikelRepository.Create(tx, artikel); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -140,39 +151,40 @@ func (s *ArtikelService) Update(ctx context.Context, request *model.ArtikelUpdat
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if err := s.AdminPuskesmasRepository.FindById(tx, &entity.AdminPuskesmas{}, request.IdAdminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	artikel := new(entity.Artikel)
 	if request.CurrentAdminPuskesmas {
-		if err := s.ArtikelRepository.FindByIdAndIdAdminPuskesmas(tx, artikel, request.ID, request.IdAdminPuskesmas); err != nil {
-			log.Println(err.Error())
+		if err := s.ArtikelRepository.FindByIdAndIdAdminPuskesmas(tx, artikel, request.IdAdminPuskesmas, request.ID); err != nil {
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.ArtikelRepository.FindById(tx, artikel, request.ID); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	artikel.Judul = request.Judul
+	artikel.Ringkasan = request.Ringkasan
 	artikel.Isi = request.Isi
 	artikel.IdAdminPuskesmas = request.IdAdminPuskesmas
 
 	if err := s.ArtikelRepository.Update(tx, artikel); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -186,23 +198,23 @@ func (s *ArtikelService) Delete(ctx context.Context, request *model.ArtikelDelet
 	artikel := new(entity.Artikel)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.ArtikelRepository.FindByIdAndIdAdminPuskesmas(tx, artikel, request.IdAdminPuskesmas, request.ID); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
 		if err := s.ArtikelRepository.FindById(tx, artikel, request.ID); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 
 	if err := s.ArtikelRepository.Delete(tx, artikel); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

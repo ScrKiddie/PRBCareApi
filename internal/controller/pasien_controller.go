@@ -1,16 +1,15 @@
 package controller
 
 import (
-	"log"
-	"math"
-	"strconv"
-
 	"github.com/go-playground/mold/v4"
 	"github.com/gofiber/fiber/v3"
+	"log/slog"
+	"math"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/middleware"
 	"prb_care_api/internal/model"
 	"prb_care_api/internal/service"
+	"strconv"
 )
 
 type PasienController struct {
@@ -36,7 +35,7 @@ func (c *PasienController) Search(ctx fiber.Ctx) error {
 	request.Status = ctx.Query("status")
 	response, err := c.PasienService.Search(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -54,17 +53,17 @@ func (c *PasienController) Get(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	response, err := c.PasienService.Get(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -79,7 +78,7 @@ func (c *PasienController) Create(ctx fiber.Ctx) error {
 	request := new(model.PasienCreateRequest)
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -88,12 +87,12 @@ func (c *PasienController) Create(ctx fiber.Ctx) error {
 	}
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := c.PasienService.Create(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -108,16 +107,16 @@ func (c *PasienController) Update(ctx fiber.Ctx) error {
 	request := new(model.PasienUpdateRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -129,12 +128,12 @@ func (c *PasienController) Update(ctx fiber.Ctx) error {
 	}
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := c.PasienService.Update(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -152,17 +151,17 @@ func (c *PasienController) Delete(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 
 	if err := c.PasienService.Delete(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -180,17 +179,17 @@ func (c *PasienController) Selesai(ctx fiber.Ctx) error {
 	}
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 
 	if err := c.PasienService.Selesai(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 

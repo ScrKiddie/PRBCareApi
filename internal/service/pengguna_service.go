@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
@@ -41,7 +41,7 @@ func (s *PenggunaService) List(ctx context.Context) (*[]model.PenggunaResponse, 
 
 	pengguna := new([]entity.Pengguna)
 	if err := s.PenggunaRepository.FindAll(tx, pengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -57,7 +57,7 @@ func (s *PenggunaService) List(ctx context.Context) (*[]model.PenggunaResponse, 
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -69,18 +69,18 @@ func (s *PenggunaService) Get(ctx context.Context, request *model.PenggunaGetReq
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -100,13 +100,13 @@ func (s *PenggunaService) Create(ctx context.Context, request *model.PenggunaCre
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	total, err := s.PenggunaRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -115,7 +115,7 @@ func (s *PenggunaService) Create(ctx context.Context, request *model.PenggunaCre
 
 	total, err = s.PenggunaRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -124,7 +124,7 @@ func (s *PenggunaService) Create(ctx context.Context, request *model.PenggunaCre
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -137,12 +137,12 @@ func (s *PenggunaService) Create(ctx context.Context, request *model.PenggunaCre
 	penggunaEnity.Password = string(password)
 
 	if err := s.PenggunaRepository.Create(tx, penggunaEnity); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -154,19 +154,19 @@ func (s *PenggunaService) Update(ctx context.Context, request *model.PenggunaUpd
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	total, err := s.PenggunaRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && pengguna.Username != request.Username {
@@ -175,7 +175,7 @@ func (s *PenggunaService) Update(ctx context.Context, request *model.PenggunaUpd
 
 	total, err = s.PenggunaRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && pengguna.Telepon != request.Telepon {
@@ -186,7 +186,7 @@ func (s *PenggunaService) Update(ctx context.Context, request *model.PenggunaUpd
 	if request.Password != "" {
 		password, err = bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 		if err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrInternalServerError
 		}
 	}
@@ -201,12 +201,12 @@ func (s *PenggunaService) Update(ctx context.Context, request *model.PenggunaUpd
 	}
 
 	if err := s.PenggunaRepository.Update(tx, pengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -218,13 +218,13 @@ func (s *PenggunaService) Delete(ctx context.Context, request *model.PenggunaDel
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -233,12 +233,12 @@ func (s *PenggunaService) Delete(ctx context.Context, request *model.PenggunaDel
 	}
 
 	if err := s.PenggunaRepository.Delete(tx, pengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -250,7 +250,7 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
@@ -261,7 +261,7 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 
 	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if !ok {
@@ -270,7 +270,7 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 
 	total, err := s.PenggunaRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -279,7 +279,7 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 
 	total, err = s.PenggunaRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -288,7 +288,7 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -301,12 +301,12 @@ func (s *PenggunaService) Register(ctx context.Context, request *model.PenggunaR
 	penggunaEnity.Password = string(password)
 
 	if err := s.PenggunaRepository.Create(tx, penggunaEnity); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -318,7 +318,7 @@ func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLogi
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
@@ -329,7 +329,7 @@ func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLogi
 
 	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 	if !ok {
@@ -338,12 +338,12 @@ func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLogi
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindByUsername(tx, pengguna, request.Username); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(pengguna.Password), []byte(request.Password)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
@@ -357,12 +357,12 @@ func (s *PenggunaService) Login(ctx context.Context, request *model.PenggunaLogi
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(key))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -374,18 +374,18 @@ func (s *PenggunaService) Verify(ctx context.Context, request *model.PenggunaVer
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -397,18 +397,18 @@ func (s *PenggunaService) Current(ctx context.Context, request *model.PenggunaGe
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -426,19 +426,19 @@ func (s *PenggunaService) CurrentProfileUpdate(ctx context.Context, request *mod
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	total, err := s.PenggunaRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -452,12 +452,12 @@ func (s *PenggunaService) CurrentProfileUpdate(ctx context.Context, request *mod
 	pengguna.TeleponKeluarga = request.TeleponKeluarga
 
 	if err := s.PenggunaRepository.Update(tx, pengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -469,35 +469,35 @@ func (s *PenggunaService) CurrentPasswordUpdate(ctx context.Context, request *mo
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(pengguna.Password), []byte(request.CurrentPassword)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.NewError(fiber.StatusUnauthorized, "Password saat ini salah")
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	pengguna.Password = string(password)
 
 	if err := s.PenggunaRepository.Update(tx, pengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -509,25 +509,25 @@ func (s *PenggunaService) CurrentTokenPerangkatUpdate(ctx context.Context, reque
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pengguna := new(entity.Pengguna)
 	if err := s.PenggunaRepository.FindById(tx, pengguna, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	pengguna.TokenPerangkat = request.TokenPerangkat
 
 	if err := s.PenggunaRepository.Update(tx, pengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

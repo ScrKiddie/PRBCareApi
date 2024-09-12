@@ -16,11 +16,11 @@ type PengambilanObatSearchRequest struct {
 	IdPengguna       int32  `validate:"omitempty,numeric"`
 	IdAdminPuskesmas int32  `validate:"omitempty,numeric"`
 	IdAdminApotek    int32  `validate:"omitempty,numeric"`
-	Status           string `json:"status" validate:"omitempty,oneof=menunggu diambil batal"`
+	Status           string `validate:"omitempty,oneof=menunggu diambil batal"`
 }
 
 type PengambilanObatGetRequest struct {
-	ID               int32 `json:"id" validate:"required,numeric"`
+	ID               int32 `validate:"required,numeric"`
 	IdAdminPuskesmas int32 `validate:"omitempty,numeric"`
 }
 type PengambilanObatCreateRequest struct {

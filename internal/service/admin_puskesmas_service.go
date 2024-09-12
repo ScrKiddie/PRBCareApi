@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
@@ -41,7 +41,7 @@ func (s *AdminPuskesmasService) List(ctx context.Context) (*[]model.AdminPuskesm
 
 	adminPuskesmas := new([]entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindAll(tx, adminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -57,7 +57,7 @@ func (s *AdminPuskesmasService) List(ctx context.Context) (*[]model.AdminPuskesm
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -69,18 +69,18 @@ func (s *AdminPuskesmasService) Get(ctx context.Context, request *model.AdminPus
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -100,13 +100,13 @@ func (s *AdminPuskesmasService) Create(ctx context.Context, request *model.Admin
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	total, err := s.AdminPuskesmasRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -115,7 +115,7 @@ func (s *AdminPuskesmasService) Create(ctx context.Context, request *model.Admin
 
 	total, err = s.AdminPuskesmasRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 {
@@ -124,7 +124,7 @@ func (s *AdminPuskesmasService) Create(ctx context.Context, request *model.Admin
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -137,12 +137,12 @@ func (s *AdminPuskesmasService) Create(ctx context.Context, request *model.Admin
 	adminPuskesmasEnity.Password = string(password)
 
 	if err := s.AdminPuskesmasRepository.Create(tx, adminPuskesmasEnity); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -154,19 +154,19 @@ func (s *AdminPuskesmasService) Update(ctx context.Context, request *model.Admin
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	total, err := s.AdminPuskesmasRepository.CountByUsername(tx, request.Username)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && adminPuskesmas.Username != request.Username {
@@ -175,7 +175,7 @@ func (s *AdminPuskesmasService) Update(ctx context.Context, request *model.Admin
 
 	total, err = s.AdminPuskesmasRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && adminPuskesmas.Telepon != request.Telepon {
@@ -186,7 +186,7 @@ func (s *AdminPuskesmasService) Update(ctx context.Context, request *model.Admin
 	if request.Password != "" {
 		password, err = bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 		if err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrInternalServerError
 		}
 	}
@@ -201,12 +201,12 @@ func (s *AdminPuskesmasService) Update(ctx context.Context, request *model.Admin
 	}
 
 	if err := s.AdminPuskesmasRepository.Update(tx, adminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -218,13 +218,13 @@ func (s *AdminPuskesmasService) Delete(ctx context.Context, request *model.Admin
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -233,12 +233,12 @@ func (s *AdminPuskesmasService) Delete(ctx context.Context, request *model.Admin
 	}
 
 	if err := s.AdminPuskesmasRepository.Delete(tx, adminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -250,7 +250,7 @@ func (s *AdminPuskesmasService) Login(ctx context.Context, request *model.AdminP
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
@@ -261,7 +261,7 @@ func (s *AdminPuskesmasService) Login(ctx context.Context, request *model.AdminP
 
 	ok, err := s.RecaptchaAdapter.Verify(captchaRequest)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 	if !ok {
@@ -270,12 +270,12 @@ func (s *AdminPuskesmasService) Login(ctx context.Context, request *model.AdminP
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindByUsername(tx, adminPuskesmas, request.Username); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(adminPuskesmas.Password), []byte(request.Password)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Username atau password salah")
 	}
 
@@ -289,12 +289,12 @@ func (s *AdminPuskesmasService) Login(ctx context.Context, request *model.AdminP
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(key))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -306,18 +306,18 @@ func (s *AdminPuskesmasService) Verify(ctx context.Context, request *model.Admin
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -329,18 +329,18 @@ func (s *AdminPuskesmasService) Current(ctx context.Context, request *model.Admi
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -358,19 +358,19 @@ func (s *AdminPuskesmasService) CurrentProfileUpdate(ctx context.Context, reques
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	total, err := s.AdminPuskesmasRepository.CountByTelepon(tx, request.Telepon)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if total > 0 && adminPuskesmas.Telepon != request.Telepon {
@@ -383,12 +383,12 @@ func (s *AdminPuskesmasService) CurrentProfileUpdate(ctx context.Context, reques
 	adminPuskesmas.Telepon = request.Telepon
 
 	if err := s.AdminPuskesmasRepository.Update(tx, adminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -400,35 +400,35 @@ func (s *AdminPuskesmasService) CurrentPasswordUpdate(ctx context.Context, reque
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	adminPuskesmas := new(entity.AdminPuskesmas)
 	if err := s.AdminPuskesmasRepository.FindById(tx, adminPuskesmas, request.ID); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(adminPuskesmas.Password), []byte(request.CurrentPassword)); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.NewError(fiber.StatusUnauthorized, "Password saat ini salah")
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	adminPuskesmas.Password = string(password)
 
 	if err := s.AdminPuskesmasRepository.Update(tx, adminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 

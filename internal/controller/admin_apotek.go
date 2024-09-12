@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/go-playground/mold/v4"
 	"github.com/gofiber/fiber/v3"
-	"log"
+	"log/slog"
 	"math"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/middleware"
@@ -24,12 +24,12 @@ func NewAdminApotekController(apotekService *service.AdminApotekService, modifie
 func (c *AdminApotekController) Login(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekLoginRequest)
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	response, err := c.AdminApotekService.Login(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -45,7 +45,7 @@ func (c *AdminApotekController) Current(ctx fiber.Ctx) error {
 	request.ID = auth.ID
 	response, err := c.AdminApotekService.Current(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -60,15 +60,15 @@ func (c *AdminApotekController) CurrentProfileUpdate(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekProfileUpdateRequest)
 	request.ID = auth.ID
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if err := c.AdminApotekService.CurrentProfileUpdate(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -83,11 +83,11 @@ func (c *AdminApotekController) CurrentPasswordUpdate(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekPasswordUpdateRequest)
 	request.ID = auth.ID
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if err := c.AdminApotekService.CurrentPasswordUpdate(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -97,7 +97,7 @@ func (c *AdminApotekController) CurrentPasswordUpdate(ctx fiber.Ctx) error {
 func (c *AdminApotekController) List(ctx fiber.Ctx) error {
 	response, err := c.AdminApotekService.List(ctx.Context())
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -112,17 +112,17 @@ func (c *AdminApotekController) Get(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekGetRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 	response, err := c.AdminApotekService.Get(ctx.Context(), request)
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -137,17 +137,17 @@ func (c *AdminApotekController) Create(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekCreateRequest)
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := c.AdminApotekService.Create(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -162,28 +162,28 @@ func (c *AdminApotekController) Update(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekUpdateRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 
 	if err := ctx.Bind().JSON(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	request.ID = int32(id)
 
 	if err := c.Modifier.Struct(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := c.AdminApotekService.Update(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -198,17 +198,17 @@ func (c *AdminApotekController) Delete(ctx fiber.Ctx) error {
 	request := new(model.AdminApotekDeleteRequest)
 	id, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	if id < math.MinInt32 || id > math.MaxInt32 {
-		log.Println("value out of range for int32")
+		slog.Error("value out of range for int32")
 		return fiber.ErrBadRequest
 	}
 	request.ID = int32(id)
 
 	if err := c.AdminApotekService.Delete(ctx.UserContext(), request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 

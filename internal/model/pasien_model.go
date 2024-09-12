@@ -14,10 +14,10 @@ type PasienResponse struct {
 type PasienSearchRequest struct {
 	IdPengguna       int32  `validate:"omitempty,numeric"`
 	IdAdminPuskesmas int32  `validate:"omitempty,numeric"`
-	Status           string `json:"status" validate:"omitempty,oneof=aktif selesai"`
+	Status           string `validate:"omitempty,oneof=aktif selesai"`
 }
 type PasienGetRequest struct {
-	ID               int32 `json:"id" validate:"required,numeric"`
+	ID               int32 `validate:"required,numeric"`
 	IdPengguna       int32 `validate:"omitempty,numeric"`
 	IdAdminPuskesmas int32 `validate:"omitempty,numeric"`
 }

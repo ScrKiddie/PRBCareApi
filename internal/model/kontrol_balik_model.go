@@ -20,10 +20,10 @@ type KontrolBalikResponse struct {
 type KontrolBalikSearchRequest struct {
 	IdPengguna       int32  `validate:"omitempty,numeric"`
 	IdAdminPuskesmas int32  `validate:"omitempty,numeric"`
-	Status           string `json:"status" validate:"omitempty,oneof=menunggu selesai batal"`
+	Status           string `validate:"omitempty,oneof=menunggu selesai batal"`
 }
 type KontrolBalikGetRequest struct {
-	ID               int32 `json:"id" validate:"required,numeric"`
+	ID               int32 `validate:"required,numeric"`
 	IdAdminPuskesmas int32 `validate:"omitempty,numeric"`
 }
 type KontrolBalikCreateRequest struct {

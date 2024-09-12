@@ -43,7 +43,7 @@ type PenggunaVerifyRequest struct {
 	ID int32 `validate:"required,numeric"`
 }
 type PenggunaGetRequest struct {
-	ID int32 `json:"id" validate:"required,numeric"`
+	ID int32 `validate:"required,numeric"`
 }
 type PenggunaCreateRequest struct {
 	NamaLengkap     string `json:"namaLengkap" mod:"normalize_spaces" validate:"required,min=3,max=50"`

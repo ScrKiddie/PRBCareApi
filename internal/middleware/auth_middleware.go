@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/model"
 	"prb_care_api/internal/service"
@@ -26,13 +26,13 @@ func AuthMiddleware(config *viper.Viper, adminSuperService *service.AdminSuperSe
 
 		tokenVerify, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				log.Println("Unexpected signing method:", token.Header["alg"])
+				slog.Error("Unexpected", "signing method", token.Header["alg"])
 				return nil, fiber.ErrInternalServerError
 			}
 			return []byte(config.GetString("jwt.secret")), nil
 		})
 		if err != nil {
-			log.Println("Error parsing token:", err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrUnauthorized
 		}
 
@@ -56,7 +56,7 @@ func AuthMiddleware(config *viper.Viper, adminSuperService *service.AdminSuperSe
 		if role == constant.RoleAdminSuper {
 			request := &model.AdminSuperVerifyRequest{ID: id}
 			if err := adminSuperService.Verify(ctx.UserContext(), request); err == nil {
-				log.Printf("Authenticated as AdminSuper: %+v", id)
+				slog.Info("Authenticated as", "AdminSuper:", id)
 				auth := &model.Auth{ID: id, Role: role}
 				ctx.Locals("auth", auth)
 				return ctx.Next()
@@ -64,7 +64,7 @@ func AuthMiddleware(config *viper.Viper, adminSuperService *service.AdminSuperSe
 		} else if role == constant.RoleAdminPuskesmas {
 			request := &model.AdminPuskesmasVerifyRequest{ID: id}
 			if err := adminPuskesmasService.Verify(ctx.UserContext(), request); err == nil {
-				log.Printf("Authenticated as AdminPuskesmas: %+v", id)
+				slog.Info("Authenticated as", "AdminPuskesmas", id)
 				auth := &model.Auth{ID: id, Role: role}
 				ctx.Locals("auth", auth)
 				return ctx.Next()
@@ -72,7 +72,7 @@ func AuthMiddleware(config *viper.Viper, adminSuperService *service.AdminSuperSe
 		} else if role == constant.RoleAdminApotek {
 			request := &model.AdminApotekVerifyRequest{ID: id}
 			if err := adminApotekService.Verify(ctx.UserContext(), request); err == nil {
-				log.Printf("Authenticated as AdminApotek: %+v", id)
+				slog.Info("Authenticated as", "AdminApotek:", id)
 				auth := &model.Auth{ID: id, Role: role}
 				ctx.Locals("auth", auth)
 				return ctx.Next()
@@ -80,7 +80,7 @@ func AuthMiddleware(config *viper.Viper, adminSuperService *service.AdminSuperSe
 		} else if role == constant.RolePengguna {
 			request := &model.PenggunaVerifyRequest{ID: id}
 			if err := penggunaService.Verify(ctx.UserContext(), request); err == nil {
-				log.Printf("Authenticated as Pengguna: %+v", id)
+				slog.Info("Authenticated as", "Pengguna", id)
 				auth := &model.Auth{ID: id, Role: role}
 				ctx.Locals("auth", auth)
 				return ctx.Next()

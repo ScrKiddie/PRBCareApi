@@ -31,7 +31,7 @@ type AdminApotekVerifyRequest struct {
 	ID int32 `validate:"required,numeric"`
 }
 type AdminApotekGetRequest struct {
-	ID int32 `json:"id" validate:"required,numeric"`
+	ID int32 `validate:"required,numeric"`
 }
 type AdminApotekCreateRequest struct {
 	NamaApotek       string `json:"namaApotek" mod:"normalize_spaces" validate:"required,min=3,max=50"`

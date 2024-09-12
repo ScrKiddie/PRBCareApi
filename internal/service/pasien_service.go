@@ -5,7 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"log"
+	"log/slog"
 	"prb_care_api/internal/constant"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
@@ -39,24 +39,24 @@ func (s *PasienService) Search(ctx context.Context, request *model.PasienSearchR
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	pasien := new([]entity.Pasien)
 	if request.IdPengguna > 0 {
 		if err := s.PasienRepository.SearchAsPengguna(tx, pasien, request.IdPengguna, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.SearchAsAdminPuskesmas(tx, pasien, request.IdAdminPuskesmas, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	} else {
 		if err := s.PasienRepository.Search(tx, pasien, request.Status); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrInternalServerError
 		}
 	}
@@ -86,7 +86,7 @@ func (s *PasienService) Search(ctx context.Context, request *model.PasienSearchR
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -98,23 +98,23 @@ func (s *PasienService) Get(ctx context.Context, request *model.PasienGetRequest
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrBadRequest
 	}
 
 	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.ID, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return nil, fiber.ErrNotFound
 		}
 	} else if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.ID, constant.StatusPasienAktif); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return nil, fiber.ErrInternalServerError
 	}
 
@@ -133,17 +133,17 @@ func (s *PasienService) Create(ctx context.Context, request *model.PasienCreateR
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	if err := s.AdminPuskesmasRepository.FindById(tx, &entity.AdminPuskesmas{}, request.IdAdminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := s.PenggunaRepository.FindById(tx, &entity.Pengguna{}, request.IdPengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -155,12 +155,12 @@ func (s *PasienService) Create(ctx context.Context, request *model.PasienCreateR
 	pasien.Status = constant.StatusPasienAktif
 
 	if err := s.PasienRepository.Create(tx, pasien); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -172,27 +172,27 @@ func (s *PasienService) Update(ctx context.Context, request *model.PasienUpdateR
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pasien := new(entity.Pasien)
 	if request.CurrentAdminPuskesmas {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.ID, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.ID, constant.StatusPasienAktif); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
 	if err := s.AdminPuskesmasRepository.FindById(tx, &entity.AdminPuskesmas{}, request.IdAdminPuskesmas); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 	if err := s.PenggunaRepository.FindById(tx, &entity.Pengguna{}, request.IdPengguna); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -202,12 +202,12 @@ func (s *PasienService) Update(ctx context.Context, request *model.PasienUpdateR
 	pasien.TanggalDaftar = request.TanggalDaftar
 
 	if err := s.PasienRepository.Update(tx, pasien); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -219,17 +219,17 @@ func (s *PasienService) Selesai(ctx context.Context, request *model.PasienSelesa
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.ID, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.ID, constant.StatusPasienAktif); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -244,12 +244,12 @@ func (s *PasienService) Selesai(ctx context.Context, request *model.PasienSelesa
 	pasien.Status = constant.StatusPasienSelesai
 
 	if err := s.PasienRepository.Update(tx, pasien); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
@@ -262,18 +262,18 @@ func (s *PasienService) Delete(ctx context.Context, request *model.PasienDeleteR
 	defer tx.Rollback()
 
 	if err := s.Validator.Struct(request); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
 
 	pasien := new(entity.Pasien)
 	if request.IdAdminPuskesmas > 0 {
 		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.ID, request.IdAdminPuskesmas, constant.StatusPasienSelesai); err != nil {
-			log.Println(err.Error())
+			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.ID, constant.StatusPasienSelesai); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrNotFound
 	}
 
@@ -285,12 +285,12 @@ func (s *PasienService) Delete(ctx context.Context, request *model.PasienDeleteR
 	}
 
 	if err := s.PasienRepository.Delete(tx, pasien); err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		log.Println(err.Error())
+		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
 
