@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 	"log/slog"
+	"prb_care_api/internal/adapter"
 	"prb_care_api/internal/entity"
 	"prb_care_api/internal/model"
 	"prb_care_api/internal/repository"
@@ -16,20 +18,26 @@ type ArtikelService struct {
 	DB                       *gorm.DB
 	ArtikelRepository        *repository.ArtikelRepository
 	AdminPuskesmasRepository *repository.AdminPuskesmasRepository
+	FileAdapter              *adapter.FileAdapter
 	Validator                *validator.Validate
+	Config                   *viper.Viper
 }
 
 func NewArtikelService(
 	db *gorm.DB,
 	artikelRepository *repository.ArtikelRepository,
 	adminPuskesmasRepository *repository.AdminPuskesmasRepository,
+	fileAdapter *adapter.FileAdapter,
 	validator *validator.Validate,
+	config *viper.Viper,
 ) *ArtikelService {
 	return &ArtikelService{
 		DB:                       db,
 		ArtikelRepository:        artikelRepository,
 		AdminPuskesmasRepository: adminPuskesmasRepository,
+		FileAdapter:              fileAdapter,
 		Validator:                validator,
+		Config:                   config,
 	}
 }
 
@@ -55,6 +63,7 @@ func (s *ArtikelService) Search(ctx context.Context, request *model.ArtikelSearc
 			Judul:            a.Judul,
 			Ringkasan:        a.Ringkasan,
 			TanggalPublikasi: a.TanggalPublikasi,
+			Banner:           a.Banner,
 			AdminPuskesmas: &model.AdminPuskesmasResponse{
 				ID:               a.AdminPuskesmas.ID,
 				NamaPuskesmas:    a.AdminPuskesmas.NamaPuskesmas,
@@ -94,6 +103,7 @@ func (s *ArtikelService) Get(ctx context.Context, request *model.ArtikelGetReque
 		Ringkasan:        artikel.Ringkasan,
 		Isi:              artikel.Isi,
 		TanggalPublikasi: artikel.TanggalPublikasi,
+		Banner:           artikel.Banner,
 		AdminPuskesmas: &model.AdminPuskesmasResponse{
 			ID:               artikel.AdminPuskesmas.ID,
 			NamaPuskesmas:    artikel.AdminPuskesmas.NamaPuskesmas,
@@ -111,7 +121,7 @@ func (s *ArtikelService) Get(ctx context.Context, request *model.ArtikelGetReque
 	return response, nil
 }
 
-func (s *ArtikelService) Create(ctx context.Context, request *model.ArtikelCreateRequest) error {
+func (s *ArtikelService) Create(ctx context.Context, request *model.ArtikelCreateRequest, file *model.FileUpload) error {
 	tx := s.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
@@ -125,12 +135,33 @@ func (s *ArtikelService) Create(ctx context.Context, request *model.ArtikelCreat
 		return fiber.ErrNotFound
 	}
 
+	var storedFile *model.File
+	var err error
+
+	if file != nil {
+		if err := s.Validator.Struct(file); err != nil {
+			slog.Error(err.Error())
+			return fiber.ErrBadRequest
+		}
+		if file.FileHeader != nil && file.FileHeader.Filename != "" {
+			storedFile, err = s.FileAdapter.StoreImage(s.Config.GetString("dir.pict"), file)
+			if err != nil {
+				slog.Error(err.Error())
+				return fiber.ErrInternalServerError
+			}
+		}
+	}
+
 	artikel := &entity.Artikel{
 		Judul:            request.Judul,
 		Ringkasan:        request.Ringkasan,
 		Isi:              request.Isi,
 		TanggalPublikasi: time.Now().Unix(),
 		IdAdminPuskesmas: request.IdAdminPuskesmas,
+	}
+
+	if storedFile != nil {
+		artikel.Banner = storedFile.Name
 	}
 
 	if err := s.ArtikelRepository.Create(tx, artikel); err != nil {
@@ -146,7 +177,7 @@ func (s *ArtikelService) Create(ctx context.Context, request *model.ArtikelCreat
 	return nil
 }
 
-func (s *ArtikelService) Update(ctx context.Context, request *model.ArtikelUpdateRequest) error {
+func (s *ArtikelService) Update(ctx context.Context, request *model.ArtikelUpdateRequest, file *model.FileUpload) error {
 	tx := s.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
@@ -173,10 +204,36 @@ func (s *ArtikelService) Update(ctx context.Context, request *model.ArtikelUpdat
 		}
 	}
 
+	var storedFile *model.File
+	var err error
+
+	if file != nil {
+		if err := s.Validator.Struct(file); err != nil {
+			slog.Error(err.Error())
+			return fiber.ErrBadRequest
+		}
+		if file.FileHeader != nil && file.FileHeader.Filename != "" {
+			storedFile, err = s.FileAdapter.StoreImage(s.Config.GetString("dir.pict"), file)
+			if err != nil {
+				slog.Error(err.Error())
+				return fiber.ErrInternalServerError
+			}
+		}
+	}
+
 	artikel.Judul = request.Judul
 	artikel.Ringkasan = request.Ringkasan
 	artikel.Isi = request.Isi
 	artikel.IdAdminPuskesmas = request.IdAdminPuskesmas
+
+	if storedFile != nil {
+		if artikel.Banner != "" {
+			deletedFile := new(model.File)
+			deletedFile.Name = artikel.Banner
+			s.FileAdapter.DeleteFileAsync(s.Config.GetString("dir.pict"), deletedFile)
+		}
+		artikel.Banner = storedFile.Name
+	}
 
 	if err := s.ArtikelRepository.Update(tx, artikel); err != nil {
 		slog.Error(err.Error())
@@ -206,6 +263,11 @@ func (s *ArtikelService) Delete(ctx context.Context, request *model.ArtikelDelet
 			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
+	}
+
+	if artikel.Banner != "" {
+		deletedFile := &model.File{Name: artikel.Banner}
+		s.FileAdapter.DeleteFileAsync(s.Config.GetString("dir.pict"), deletedFile)
 	}
 
 	if err := s.ArtikelRepository.Delete(tx, artikel); err != nil {

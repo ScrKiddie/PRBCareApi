@@ -168,7 +168,44 @@ tags:
     description: Operasi yang berhubungan dengan pengambilan obat
   - name: Artikel
     description: Operasi yang berhubungan dengan artikel
+  - name: Static File
+    description: Operasi yang berhubungan dengan static file
 paths:
+  /static/{path}:
+    get:
+      tags:
+        - Static File
+      summary: Serve static images
+      description: Serves static image files from the asset directory
+      parameters:
+        - in: path
+          name: path
+          required: true
+          schema:
+            type: string
+          description: Path to the image file (e.g., newimage.jpg)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
   /api/admin-super/login:
     post:
       tags:
@@ -2704,6 +2741,8 @@ paths:
                       properties:
                         id:
                           type: integer
+                        banner:
+                          type: string
                         adminPuskesmas:
                           $ref: '#/components/schemas/get_puskesmas'
                         judul:
@@ -2730,12 +2769,15 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 idAdminPuskesmas:
                   type: integer
+                banner:
+                  type: string
+                  format: binary
                 judul:
                   type: string
                 ringkasan:
@@ -2791,6 +2833,8 @@ paths:
                     properties:
                       id:
                         type: integer
+                      banner:
+                        type: string
                       adminPuskesmas:
                         $ref: '#/components/schemas/get_puskesmas'
                       judul:
@@ -2801,6 +2845,7 @@ paths:
                         type: string
                       tanggalPublikasi:
                         type: integer
+
 
         '400':
           $ref: '#/components/responses/BadRequestError'
@@ -2816,7 +2861,7 @@ paths:
     patch:
       tags:
         - Artikel
-      summary: Update pasien aktif
+      summary: Update artikel
       security:
         - bearerAuth: [ ]
       parameters:
@@ -2828,12 +2873,15 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 idAdminPuskesmas:
                   type: integer
+                banner:
+                  type: string
+                  format: binary
                 judul:
                   type: string
                 ringkasan:
@@ -2844,7 +2892,6 @@ paths:
                 - judul
                 - ringkasan
                 - isi
-                - idAdminPuskesmas
       responses:
         '200':
           description: Artikel berhasil diupdate
@@ -2900,3 +2947,4 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+

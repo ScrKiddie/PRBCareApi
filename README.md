@@ -42,7 +42,7 @@ variabel-variabel tersebut diset sebelum menjalankan proyek:
 | **DB_HOST**        | `string` | Host database.                                                                   | `localhost`                                 |
 | **DB_PORT**        | `int`    | Port koneksi database.                                                           | `3306`                                      |
 | **DB_NAME**        | `string` | Nama database.                                                                   | `prbcare`                                   |
-
+| **DIR_PICT**|	`string`|	Path direktori untuk menyimpan gambar.|	`/path/to/your/pictures` |
 
 Cara set environment variables:
 

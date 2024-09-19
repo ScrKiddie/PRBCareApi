@@ -22,5 +22,8 @@
     "host": "YOUR_DB_HOST",
     "port": 5432,
     "name": "YOUR_DB_NAME"
+  },
+  "dir" : {
+    "pict": "YOUR_PICT_PATH"
   }
 }

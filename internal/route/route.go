@@ -3,7 +3,9 @@ package route
 import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/spf13/viper"
+	"os"
 	"prb_care_api/internal/controller"
 )
 
@@ -34,7 +36,10 @@ func (c *Config) SetupGuestRoute() {
 	c.App.Post("/api/admin-apotek/login", c.AdminApotekController.Login)
 	c.App.Post("/api/pengguna/login", c.PenggunaController.Login)
 	c.App.Post("/api/pengguna/register", c.PenggunaController.Register)
-
+	c.App.Get("/static*", static.New("", static.Config{
+		FS:     os.DirFS("./assets"),
+		Browse: true,
+	}))
 }
 
 func (c *Config) SetupAuthRoute() {

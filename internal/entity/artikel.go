@@ -8,6 +8,7 @@ type Artikel struct {
 	Ringkasan        string         `gorm:"column:ringkasan;type:varchar(1000);not null"`
 	Isi              string         `gorm:"column:isi;type:text;not null"`
 	TanggalPublikasi int64          `gorm:"column:tanggal_publikasi;type:bigint;not null"`
+	Banner           string         `gorm:"column:banner;type:varchar(100);"`
 }
 
 func (Artikel) TableName() string {

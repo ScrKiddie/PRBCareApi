@@ -8,6 +8,7 @@ type ArtikelResponse struct {
 	Ringkasan        string                  `json:"ringkasan,omitempty"`
 	Isi              string                  `json:"isi,omitempty"`
 	TanggalPublikasi int64                   `json:"tanggalPublikasi"`
+	Banner           string                  `json:"banner"`
 }
 
 type ArtikelGetRequest struct {

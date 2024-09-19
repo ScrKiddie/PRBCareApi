@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-playground/mold/v4"
 	"github.com/gofiber/fiber/v3"
+	"github.com/valyala/fasthttp"
 	"log/slog"
 	"math"
 	"prb_care_api/internal/constant"
@@ -83,7 +84,7 @@ func (c *ArtikelController) Create(ctx fiber.Ctx) error {
 	}
 
 	request := new(model.ArtikelCreateRequest)
-	if err := ctx.Bind().JSON(request); err != nil {
+	if err := ctx.Bind().Body(request); err != nil {
 		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
@@ -95,8 +96,19 @@ func (c *ArtikelController) Create(ctx fiber.Ctx) error {
 		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
-	err := c.ArtikelService.Create(ctx.Context(), request)
-	if err != nil {
+	var file *model.FileUpload
+	banner, err := ctx.FormFile("banner")
+	if err != nil && err != fasthttp.ErrMissingFile {
+		slog.Error(err.Error())
+		return fiber.ErrBadRequest
+	}
+
+	if banner != nil {
+		file = &model.FileUpload{}
+		file.FileHeader = banner
+	}
+
+	if err := c.ArtikelService.Create(ctx.Context(), request, file); err != nil {
 		slog.Error(err.Error())
 		return err
 	}
@@ -121,7 +133,7 @@ func (c *ArtikelController) Update(ctx fiber.Ctx) error {
 	}
 
 	request := new(model.ArtikelUpdateRequest)
-	if err := ctx.Bind().JSON(request); err != nil {
+	if err := ctx.Bind().Body(request); err != nil {
 		slog.Error(err.Error())
 		return fiber.ErrBadRequest
 	}
@@ -138,7 +150,19 @@ func (c *ArtikelController) Update(ctx fiber.Ctx) error {
 		request.CurrentAdminPuskesmas = true
 	}
 
-	err = c.ArtikelService.Update(ctx.Context(), request)
+	var file *model.FileUpload
+	banner, err := ctx.FormFile("banner")
+	if err != nil && err != fasthttp.ErrMissingFile {
+		slog.Error(err.Error())
+		return fiber.ErrBadRequest
+	}
+
+	if banner != nil {
+		file = &model.FileUpload{}
+		file.FileHeader = banner
+	}
+
+	err = c.ArtikelService.Update(ctx.Context(), request, file)
 	if err != nil {
 		slog.Error(err.Error())
 		return err
