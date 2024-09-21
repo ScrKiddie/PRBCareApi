@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/go-playground/validator/v10"
-	"golang.org/x/image/webp"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -85,7 +84,7 @@ func ValidateImage(fl validator.FieldLevel) bool {
 
 	ext := strings.ToLower(filepath.Ext(file.Filename))
 
-	if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".webp" {
+	if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
 		slog.Error("Unsupported file extension", "filename", file.Filename)
 		return false
 	}
@@ -106,8 +105,6 @@ func ValidateImage(fl validator.FieldLevel) bool {
 	switch ext {
 	case ".jpg", ".jpeg", ".png":
 		img, _, err = image.Decode(imgFile)
-	case ".webp":
-		img, err = webp.Decode(imgFile)
 	default:
 		slog.Error("Unsupported file format", "filename", file.Filename, "extension", ext)
 		return false

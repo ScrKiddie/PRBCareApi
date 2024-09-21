@@ -5,7 +5,7 @@ import (
 )
 
 func NewFiber() *fiber.App {
-	return fiber.New(fiber.Config{ErrorHandler: ErrorHandler()})
+	return fiber.New(fiber.Config{ErrorHandler: ErrorHandler(), BodyLimit: 50 * 1024 * 1024})
 }
 func ErrorHandler() fiber.ErrorHandler {
 	return func(ctx fiber.Ctx, err error) error {

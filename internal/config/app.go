@@ -35,6 +35,7 @@ func Bootstrap(config *BootstrapConfig) {
 	kontrolBalikRepository := repository.NewKontrolBalikRepository()
 	pengambilanObatRepository := repository.NewPengambilanObatRepository()
 	artikelRepository := repository.NewArtikelRepository()
+	fileRepository := repository.NewFileRepository()
 
 	captchaAdapter := adapter.NewCaptcha(config.Client)
 	fileAdapter := adapter.NewFileAdapter()
@@ -47,7 +48,7 @@ func Bootstrap(config *BootstrapConfig) {
 	pasienService := service.NewPasienService(config.DB, pasienRepository, adminPuskesmasRepository, penggunaRepository, kontrolBalikRepository, pengambilanObatRepository, config.Validate)
 	kontrolBalikService := service.NewKontrolBalikService(config.DB, kontrolBalikRepository, pasienRepository, config.Validate)
 	pengambilanObatService := service.NewPengambilanObatService(config.DB, pengambilanObatRepository, pasienRepository, obatRepository, config.Validate)
-	artikelSevice := service.NewArtikelService(config.DB, artikelRepository, adminPuskesmasRepository, fileAdapter, config.Validate, config.Config)
+	artikelSevice := service.NewArtikelService(config.DB, artikelRepository, adminPuskesmasRepository, fileRepository, fileAdapter, config.Validate, config.Config)
 
 	adminSuperController := controller.NewAdminSuperController(adminSuperService)
 	adminPuskesmasController := controller.NewAdminPuskesmasController(adminPuskesmasService, config.Modifier)

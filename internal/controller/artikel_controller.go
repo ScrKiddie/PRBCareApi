@@ -96,7 +96,7 @@ func (c *ArtikelController) Create(ctx fiber.Ctx) error {
 		slog.Error(err.Error())
 		return fiber.ErrInternalServerError
 	}
-	var file *model.FileUpload
+	var file *model.File
 	banner, err := ctx.FormFile("banner")
 	if err != nil && err != fasthttp.ErrMissingFile {
 		slog.Error(err.Error())
@@ -104,7 +104,7 @@ func (c *ArtikelController) Create(ctx fiber.Ctx) error {
 	}
 
 	if banner != nil {
-		file = &model.FileUpload{}
+		file = &model.File{}
 		file.FileHeader = banner
 	}
 
@@ -150,7 +150,7 @@ func (c *ArtikelController) Update(ctx fiber.Ctx) error {
 		request.CurrentAdminPuskesmas = true
 	}
 
-	var file *model.FileUpload
+	var file *model.File
 	banner, err := ctx.FormFile("banner")
 	if err != nil && err != fasthttp.ErrMissingFile {
 		slog.Error(err.Error())
@@ -158,7 +158,7 @@ func (c *ArtikelController) Update(ctx fiber.Ctx) error {
 	}
 
 	if banner != nil {
-		file = &model.FileUpload{}
+		file = &model.File{}
 		file.FileHeader = banner
 	}
 
