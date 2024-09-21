@@ -3,12 +3,10 @@ package adapter
 import (
 	"bytes"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"image"
 	"image/jpeg"
-	"image/png"
 	"io"
 	"log/slog"
 	"os"
@@ -32,7 +30,7 @@ func (s *FileAdapter) StoreImageFromBase64(storePath, base64Image string) (*mode
 		return nil, err
 	}
 
-	img, format, err := image.Decode(bytes.NewReader(imgData))
+	img, _, err := image.Decode(bytes.NewReader(imgData))
 	if err != nil {
 		slog.Error("failed to decode image: " + err.Error())
 		return nil, err
@@ -50,7 +48,7 @@ func (s *FileAdapter) StoreImageFromBase64(storePath, base64Image string) (*mode
 		return nil, err
 	}
 
-	uniqueFilename := uuid.New().String() + "." + format
+	uniqueFilename := uuid.New().String() + ".jpg"
 	fullPath := filepath.Join(storePath, uniqueFilename)
 
 	outFile, err := os.Create(fullPath)
@@ -69,23 +67,33 @@ func (s *FileAdapter) StoreImageFromBase64(storePath, base64Image string) (*mode
 		}
 	}()
 
-	switch format {
-	case "jpeg", "jpg":
-		err = jpeg.Encode(outFile, img, nil)
-	case "png":
-		err = png.Encode(outFile, img)
-	default:
-		err = errors.New("unsupported image format: " + format)
-	}
-
+	options := jpeg.Options{Quality: 80}
+	var imgBuffer bytes.Buffer
+	err = jpeg.Encode(&imgBuffer, img, &options)
 	if err != nil {
 		slog.Error("failed to encode image: " + err.Error())
 		return nil, err
 	}
 
+	maxSize := 500 * 1024
+	for imgBuffer.Len() > maxSize && options.Quality > 10 {
+		options.Quality -= 10
+		imgBuffer.Reset()
+		err = jpeg.Encode(&imgBuffer, img, &options)
+		if err != nil {
+			slog.Error("failed to re-encode image: " + err.Error())
+			return nil, err
+		}
+	}
+
+	_, err = outFile.Write(imgBuffer.Bytes())
+	if err != nil {
+		slog.Error("failed to write image to file: " + err.Error())
+		return nil, err
+	}
+
 	return &model.File{Name: uniqueFilename}, nil
 }
-
 func extractBase64Data(base64Str string) string {
 	if idx := strings.Index(base64Str, ";base64,"); idx != -1 {
 		return base64Str[idx+8:]

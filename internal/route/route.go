@@ -36,9 +36,14 @@ func (c *Config) SetupGuestRoute() {
 	c.App.Post("/api/admin-apotek/login", c.AdminApotekController.Login)
 	c.App.Post("/api/pengguna/login", c.PenggunaController.Login)
 	c.App.Post("/api/pengguna/register", c.PenggunaController.Register)
+
+	c.App.Use("/static*", func(ctx fiber.Ctx) error {
+		ctx.Set("Cache-Control", "public, max-age=31536000")
+		return ctx.Next()
+	})
+
 	c.App.Get("/static*", static.New("", static.Config{
-		FS:     os.DirFS("./assets"),
-		Browse: true,
+		FS: os.DirFS("./assets"),
 	}))
 }
 
