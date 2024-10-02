@@ -180,7 +180,7 @@ func (s *PengambilanObatService) Create(ctx context.Context, request *model.Peng
 	}
 
 	pengambilanObat := new(entity.PengambilanObat)
-	pengambilanObat.Resi = fmt.Sprintf("%d%d", request.IdPasien, request.TanggalPengambilan)
+	pengambilanObat.Resi = fmt.Sprintf("%d%d%d", request.IdPasien, request.TanggalPengambilan, obat.IdAdminApotek)
 	pengambilanObat.IdPasien = request.IdPasien
 	pengambilanObat.IdObat = request.IdObat
 	pengambilanObat.Jumlah = request.Jumlah
@@ -272,7 +272,7 @@ func (s *PengambilanObatService) Update(ctx context.Context, request *model.Peng
 		return fiber.ErrInternalServerError
 	}
 
-	pengambilanObat.Resi = fmt.Sprintf("%d%d", request.IdPasien, request.TanggalPengambilan)
+	pengambilanObat.Resi = fmt.Sprintf("%d%d%d", request.IdPasien, request.TanggalPengambilan, obatNew.IdAdminApotek)
 	pengambilanObat.IdPasien = request.IdPasien
 	pengambilanObat.IdObat = request.IdObat
 	pengambilanObat.Jumlah = request.Jumlah
