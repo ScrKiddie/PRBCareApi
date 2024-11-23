@@ -11,4 +11,7 @@ const (
 	StatusKontrolBalikMenunggu = "menunggu"
 	StatusKontrolBalikSelesai  = "selesai"
 	StatusKontrolBalikBatal    = "batal"
+
+	StatusProlanisAktif   = "aktif"
+	StatusProlanisSelesai = "selesai"
 )

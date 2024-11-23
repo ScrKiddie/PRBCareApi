@@ -168,6 +168,8 @@ tags:
     description: Operasi yang berhubungan dengan pengambilan obat
   - name: Artikel
     description: Operasi yang berhubungan dengan artikel
+  - name: Prolanis
+    description: Operasi yang berhubungan dengan prolanis
   - name: Static File
     description: Operasi yang berhubungan dengan static file
 paths:
@@ -2948,3 +2950,259 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/prolanis:
+    get:
+      tags:
+        - Prolanis
+      summary: Get all prolanis
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: Filter prolanis by status
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    adminPuskesmas:
+                      $ref: '#/components/schemas/get_puskesmas'
+                    deskripsi:
+                      type: string
+                    waktuMulai:
+                      type: integer
+                    waktuSelesai:
+                      type: integer
+                    status:
+                      type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Prolanis
+      summary: Create new prolanis aktif
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idAdminPuskesmas:
+                  type: integer
+                deskripsi:
+                  type: string
+                waktuMulai:
+                  type: integer
+                waktuSelesai:
+                  type: integer
+              required:
+                - idAdminPuskesmas
+                - deskripsi
+                - waktuMulai
+                - waktuSelesai
+      responses:
+        '201':
+          description: Prolanis berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Prolanis berhasil dibuat
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/prolanis/{id}:
+    get:
+      tags:
+        - Prolanis
+      summary: Get prolanis aktif by id
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      idAdminPuskesmas:
+                        type: integer
+                      deskripsi:
+                        type: string
+                      waktuMulai:
+                        type: integer
+                      waktuSelesai:
+                        type: integer
+                      status:
+                        type: string
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Prolanis
+      summary: Update prolanis aktif
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                idAdminPuskesmas:
+                  type: integer
+                deskripsi:
+                  type: string
+                waktuMulai:
+                  type: integer
+                waktuSelesai:
+                  type: integer
+              required:
+                - idAdminPuskesmas
+                - deskripsi
+                - waktuMulai
+                - waktuSelesai
+      responses:
+        '200':
+          description: Prolanis berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Prolanis berhasil diupdate
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Prolanis
+      summary: Delete prolanis selesai
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Prolanis berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Pasien berhasil dihapus
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/prolanis/{id}/selesai:
+    patch:
+      tags:
+        - Prolanis
+      summary: Tandai prolanis aktif sebagai selesai
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Prolanis berhasil ditandai selesai
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Prolanis berhasil ditandai selesai
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '408':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'

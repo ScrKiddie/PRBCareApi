@@ -48,6 +48,7 @@ func Migrate(ctx context.Context, db *gorm.DB) error {
 		"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_pasien_enum') THEN CREATE TYPE status_pasien_enum AS ENUM ('aktif', 'selesai'); END IF; END $$;",
 		"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_pengambilan_obat_enum') THEN CREATE TYPE status_pengambilan_obat_enum AS ENUM ('menunggu', 'diambil', 'batal'); END IF; END $$;",
 		"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_kontrol_balik_enum') THEN CREATE TYPE status_kontrol_balik_enum AS ENUM ('menunggu', 'selesai', 'batal'); END IF; END $$;",
+		"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_prolanis_enum') THEN CREATE TYPE status_prolanis_enum AS ENUM ('aktif', 'selesai'); END IF; END $$;",
 	}
 
 	for _, query := range enumQueries {
@@ -68,6 +69,7 @@ func Migrate(ctx context.Context, db *gorm.DB) error {
 		&entity.PengambilanObat{},
 		&entity.Artikel{},
 		&entity.File{},
+		&entity.Prolanis{},
 	}
 
 	for _, e := range entities {

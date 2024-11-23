@@ -36,12 +36,13 @@ func Bootstrap(config *BootstrapConfig) {
 	pengambilanObatRepository := repository.NewPengambilanObatRepository()
 	artikelRepository := repository.NewArtikelRepository()
 	fileRepository := repository.NewFileRepository()
+	prolanisRepository := repository.NewProlanisRepository()
 
 	captchaAdapter := adapter.NewCaptcha(config.Client)
 	fileAdapter := adapter.NewFileAdapter()
 
 	adminSuperService := service.NewAdminSuperService(config.DB, adminSuperRepository, captchaAdapter, config.Validate, config.Config)
-	adminPuskesmasService := service.NewAdminPuskesmasService(config.DB, adminPuskesmasRepository, pasienRepository, captchaAdapter, config.Validate, config.Config)
+	adminPuskesmasService := service.NewAdminPuskesmasService(config.DB, adminPuskesmasRepository, pasienRepository, artikelRepository, prolanisRepository, captchaAdapter, config.Validate, config.Config)
 	adminApotekService := service.NewAdminApotekService(config.DB, adminApotekRepository, obatRepository, config.Validate, captchaAdapter, config.Config)
 	penggunaService := service.NewPenggunaService(config.DB, penggunaRepository, pasienRepository, config.Validate, captchaAdapter, config.Config)
 	obatService := service.NewObatService(config.DB, obatRepository, adminApotekRepository, pengambilanObatRepository, config.Validate)
@@ -49,6 +50,7 @@ func Bootstrap(config *BootstrapConfig) {
 	kontrolBalikService := service.NewKontrolBalikService(config.DB, kontrolBalikRepository, pasienRepository, config.Validate)
 	pengambilanObatService := service.NewPengambilanObatService(config.DB, pengambilanObatRepository, pasienRepository, obatRepository, config.Validate)
 	artikelSevice := service.NewArtikelService(config.DB, artikelRepository, adminPuskesmasRepository, fileRepository, fileAdapter, config.Validate, config.Config)
+	prolanisService := service.NewProlanisService(config.DB, prolanisRepository, adminPuskesmasRepository, config.Validate)
 
 	adminSuperController := controller.NewAdminSuperController(adminSuperService)
 	adminPuskesmasController := controller.NewAdminPuskesmasController(adminPuskesmasService, config.Modifier)
@@ -59,6 +61,7 @@ func Bootstrap(config *BootstrapConfig) {
 	kontrolBalikController := controller.NewKontrolBalikController(kontrolBalikService, config.Modifier)
 	pengambilanObatController := controller.NewPengambilanObatController(pengambilanObatService)
 	artikelController := controller.NewArtikelController(artikelSevice, config.Modifier)
+	prolanisController := controller.NewProlanisController(prolanisService)
 
 	authMiddleware := middleware.AuthMiddleware(config.Config, adminSuperService, adminPuskesmasService, adminApotekService, penggunaService)
 
@@ -74,6 +77,7 @@ func Bootstrap(config *BootstrapConfig) {
 		KontrolBalikController:    kontrolBalikController,
 		PengambilanObatController: pengambilanObatController,
 		ArtikelController:         artikelController,
+		ProlanisController:        prolanisController,
 		Config:                    config.Config,
 	}
 	route.Setup()

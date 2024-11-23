@@ -27,3 +27,6 @@ func (r *ArtikelRepository) FindById(db *gorm.DB, artikel *entity.Artikel, id in
 func (r *ArtikelRepository) FindByIdAndIdAdminPuskesmas(db *gorm.DB, artikel *entity.Artikel, idAdminPuskesmas int32, id int32) error {
 	return db.Where("id = ?", id).Where("id_admin_puskesmas = ?", idAdminPuskesmas).Preload("AdminPuskesmas").First(artikel).Error
 }
+func (r *ArtikelRepository) FindByIdAdminPuskesmas(db *gorm.DB, artikel *entity.Artikel, idAdminPuskesmas int32) error {
+	return db.Where("id_admin_puskesmas = ?", idAdminPuskesmas).First(artikel).Error
+}

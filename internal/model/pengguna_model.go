@@ -67,5 +67,5 @@ type PenggunaDeleteRequest struct {
 }
 type PenggunaTokenPerangkatUpdateRequest struct {
 	ID             int32  `validate:"required,numeric"`
-	TokenPerangkat string `json:"tokenPerangkat" validate:"required,min=163,max=255"`
+	TokenPerangkat string `json:"tokenPerangkat" validate:"required,max=255"`
 }

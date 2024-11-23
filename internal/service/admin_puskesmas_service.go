@@ -21,6 +21,8 @@ type AdminPuskesmasService struct {
 	DB                       *gorm.DB
 	AdminPuskesmasRepository *repository.AdminPuskesmasRepository
 	PasienRepository         *repository.PasienRepository
+	ArtikelRepository        *repository.ArtikelRepository
+	ProlanisRepository       *repository.ProlanisRepository
 	RecaptchaAdapter         *adapter.Captcha
 	Validator                *validator.Validate
 	Config                   *viper.Viper
@@ -29,10 +31,12 @@ type AdminPuskesmasService struct {
 func NewAdminPuskesmasService(db *gorm.DB,
 	adminPuskesmasRepository *repository.AdminPuskesmasRepository,
 	pasienRepository *repository.PasienRepository,
+	artikelRepository *repository.ArtikelRepository,
+	prolanisRepository *repository.ProlanisRepository,
 	captchaAdapter *adapter.Captcha,
 	validator *validator.Validate,
 	config *viper.Viper) *AdminPuskesmasService {
-	return &AdminPuskesmasService{db, adminPuskesmasRepository, pasienRepository, captchaAdapter, validator, config}
+	return &AdminPuskesmasService{db, adminPuskesmasRepository, pasienRepository, artikelRepository, prolanisRepository, captchaAdapter, validator, config}
 }
 
 func (s *AdminPuskesmasService) List(ctx context.Context) (*[]model.AdminPuskesmasResponse, error) {
@@ -230,6 +234,12 @@ func (s *AdminPuskesmasService) Delete(ctx context.Context, request *model.Admin
 
 	if err := s.PasienRepository.FindByIdAdminPuskesmas(tx, &entity.Pasien{}, request.ID); err == nil {
 		return fiber.NewError(fiber.StatusConflict, "Admin puskesmas masih terkait dengan data pasien yang ada")
+	}
+	if err := s.ArtikelRepository.FindByIdAdminPuskesmas(tx, &entity.Artikel{}, request.ID); err == nil {
+		return fiber.NewError(fiber.StatusConflict, "Admin puskesmas masih terkait dengan data artikel yang ada")
+	}
+	if err := s.ProlanisRepository.FindByIdAdminPuskesmas(tx, &entity.Prolanis{}, request.ID); err == nil {
+		return fiber.NewError(fiber.StatusConflict, "Admin puskesmas masih terkait dengan data prolanis yang ada")
 	}
 
 	if err := s.AdminPuskesmasRepository.Delete(tx, adminPuskesmas); err != nil {

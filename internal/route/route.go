@@ -21,6 +21,7 @@ type Config struct {
 	KontrolBalikController    *controller.KontrolBalikController
 	PengambilanObatController *controller.PengambilanObatController
 	ArtikelController         *controller.ArtikelController
+	ProlanisController        *controller.ProlanisController
 	Config                    *viper.Viper
 }
 
@@ -114,6 +115,13 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Post("/api/artikel", c.ArtikelController.Create)
 	c.App.Patch("/api/artikel/:id", c.ArtikelController.Update)
 	c.App.Delete("/api/artikel/:id", c.ArtikelController.Delete)
+
+	c.App.Get("/api/prolanis", c.ProlanisController.Search)
+	c.App.Get("/api/prolanis/:id", c.ProlanisController.Get)
+	c.App.Post("/api/prolanis", c.ProlanisController.Create)
+	c.App.Patch("/api/prolanis/:id", c.ProlanisController.Update)
+	c.App.Delete("/api/prolanis/:id", c.ProlanisController.Delete)
+	c.App.Patch("/api/prolanis/:id/selesai", c.ProlanisController.Selesai)
 }
 
 func (c *Config) Setup() {
