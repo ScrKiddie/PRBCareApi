@@ -20,8 +20,10 @@ func (r *ProlanisRepository) Search(db *gorm.DB, prolanis *[]entity.Prolanis, st
 	}
 	if idAdminPuskesmas != 0 {
 		query = query.Where("id_admin_puskesmas = ?", idAdminPuskesmas)
+	} else {
+		query = query.Preload("AdminPuskesmas")
 	}
-	return query.Preload("AdminPuskesmas").Find(&prolanis).Error
+	return query.Find(&prolanis).Error
 }
 
 func (r *ProlanisRepository) FindAll(db *gorm.DB, prolanis *[]entity.Prolanis) error {

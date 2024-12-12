@@ -17,8 +17,10 @@ func (r *ArtikelRepository) Search(db *gorm.DB, artikel *[]entity.Artikel, idAdm
 	query := db
 	if idAdminPuskesmas != 0 {
 		query = query.Where("id_admin_puskesmas = ?", idAdminPuskesmas)
+	} else {
+		query = query.Preload("AdminPuskesmas")
 	}
-	return query.Preload("AdminPuskesmas").Find(artikel).Error
+	return query.Find(artikel).Error
 }
 
 func (r *ArtikelRepository) FindById(db *gorm.DB, artikel *entity.Artikel, id int32) error {
