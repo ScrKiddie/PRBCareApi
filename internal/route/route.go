@@ -46,6 +46,7 @@ func (c *Config) SetupGuestRoute() {
 	c.App.Get("/static*", static.New("", static.Config{
 		FS: os.DirFS("./assets"),
 	}))
+
 }
 
 func (c *Config) SetupAuthRoute() {

@@ -70,35 +70,3 @@ func (r *KontrolBalikRepository) FindByIdPasien(db *gorm.DB, kontrolBalik *entit
 	return db.Where("id_pasien = ?", idPasien).
 		First(&kontrolBalik).Error
 }
-
-func (r *KontrolBalikRepository) FindMaksNoAntreanByTanggalKontrolAndIdAdminPuskesmasAndStatus(db *gorm.DB, tanggalKontrol int64, idAdminPuskesmas int32, status string) (int32, error) {
-	var maxNoAntrean *int32
-	err := db.Model(&entity.KontrolBalik{}).Joins("JOIN pasien ON pasien.id = kontrol_balik.id_pasien").
-		Where("kontrol_balik.tanggal_kontrol = ?", tanggalKontrol).
-		Where("pasien.id_admin_puskesmas = ?", idAdminPuskesmas).
-		Where("kontrol_balik.status = ?", status).
-		Select("MAX(kontrol_balik.no_antrean)").
-		Scan(&maxNoAntrean).Error
-	if err != nil {
-		return 0, err
-	}
-	if maxNoAntrean == nil {
-		return 0, nil
-	}
-	return *maxNoAntrean, nil
-}
-
-func (r *KontrolBalikRepository) CountByNoAntreanAndTanggalKontrolAndIdAdminPuskesmasAndStatus(db *gorm.DB, noAntrean int32, tanggalKontrol int64, idAdminPuskesmas int32, status string) (int64, error) {
-	var count int64
-	if err :=
-		db.Model(&entity.KontrolBalik{}).
-			Joins("JOIN pasien ON pasien.id = kontrol_balik.id_pasien").
-			Where("kontrol_balik.no_antrean = ?", noAntrean).
-			Where("kontrol_balik.tanggal_kontrol = ?", tanggalKontrol).
-			Where("pasien.id_admin_puskesmas = ?", idAdminPuskesmas).
-			Where("kontrol_balik.status = ?", status).
-			Count(&count).Error; err != nil {
-		return 0, err
-	}
-	return count, nil
-}

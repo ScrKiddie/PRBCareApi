@@ -2036,8 +2036,6 @@ paths:
                       properties:
                         id:
                           type: integer
-                        noAntrean:
-                          type: integer
                         pasien:
                           $ref: '#/components/schemas/get_pasien'
                         keluhan:
@@ -2134,8 +2132,6 @@ paths:
                     properties:
                       id:
                         type: integer
-                      noAntrean:
-                        type: integer
                       idPasien:
                         type: integer
                       keluhan:
@@ -2186,8 +2182,6 @@ paths:
             schema:
               type: object
               properties:
-                noAntrean:
-                  type: integer
                 idPasien:
                   type: integer
                 keluhan:
@@ -2217,7 +2211,6 @@ paths:
                 tanggalKontrol:
                   type: integer
               required:
-                - noAntrean
                 - idPasien
                 - tanggalKontrol
       responses:
@@ -2233,16 +2226,6 @@ paths:
                     example: Kontrol balik berhasil diupdate
         '400':
           $ref: '#/components/responses/BadRequestError'
-        '409':
-          description: Nomor antrean pada tanggal tersebut sudah digunakan
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example: Nomor antrean pada tanggal tersebut sudah digunakan
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':

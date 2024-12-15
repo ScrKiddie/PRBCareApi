@@ -2,7 +2,6 @@ package entity
 
 type KontrolBalik struct {
 	ID             int32  `gorm:"column:id;primaryKey;type:integer;autoIncrement;not null"`
-	NoAntrean      int32  `gorm:"column:no_antrean;type:integer;not null"`
 	IdPasien       int32  `gorm:"column:id_pasien;type:integer;not null"`
 	Pasien         Pasien `gorm:"foreignKey:IdPasien"`
 	Keluhan        string `gorm:"column:keluhan;type:text"`

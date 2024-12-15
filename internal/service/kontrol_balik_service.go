@@ -58,8 +58,7 @@ func (s *KontrolBalikService) Search(ctx context.Context, request *model.Kontrol
 	var response []model.KontrolBalikResponse
 	for _, k := range *kontrolBalik {
 		response = append(response, model.KontrolBalikResponse{
-			ID:        k.ID,
-			NoAntrean: k.NoAntrean,
+			ID: k.ID,
 			PasienResponse: &model.PasienResponse{
 				ID:           k.Pasien.ID,
 				NoRekamMedis: k.Pasien.NoRekamMedis,
@@ -128,7 +127,6 @@ func (s *KontrolBalikService) Get(ctx context.Context, request *model.KontrolBal
 
 	response := new(model.KontrolBalikResponse)
 	response.ID = kontrolBalik.ID
-	response.NoAntrean = kontrolBalik.NoAntrean
 	response.Keluhan = kontrolBalik.Keluhan
 	response.BeratBadan = kontrolBalik.BeratBadan
 	response.TinggiBadan = kontrolBalik.TinggiBadan
@@ -164,15 +162,8 @@ func (s *KontrolBalikService) Create(ctx context.Context, request *model.Kontrol
 		}
 	}
 
-	noAntrean, err := s.KontrolBalikRepository.FindMaksNoAntreanByTanggalKontrolAndIdAdminPuskesmasAndStatus(tx, request.TanggalKontrol, pasien.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu)
-	if err != nil {
-		slog.Error(err.Error())
-		return fiber.ErrInternalServerError
-	}
-
 	kontrolBalik := new(entity.KontrolBalik)
 	kontrolBalik.IdPasien = request.IdPasien
-	kontrolBalik.NoAntrean = noAntrean + 1
 	kontrolBalik.TanggalKontrol = request.TanggalKontrol
 	kontrolBalik.Status = constant.StatusKontrolBalikMenunggu
 
@@ -223,17 +214,7 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 		}
 	}
 
-	total, err := s.KontrolBalikRepository.CountByNoAntreanAndTanggalKontrolAndIdAdminPuskesmasAndStatus(tx, request.NoAntrean, request.TanggalKontrol, pasien.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu)
-	if err != nil {
-		slog.Error(err.Error())
-		return fiber.ErrInternalServerError
-	}
-	if total > 0 && kontrolBalik.NoAntrean != request.NoAntrean {
-		return fiber.NewError(fiber.StatusConflict, "Nomor antrean pada tanggal tersebut sudah digunakan")
-	}
-
 	kontrolBalik.IdPasien = request.IdPasien
-	kontrolBalik.NoAntrean = request.NoAntrean
 	kontrolBalik.Keluhan = request.Keluhan
 	kontrolBalik.BeratBadan = request.BeratBadan
 	kontrolBalik.TinggiBadan = request.TinggiBadan

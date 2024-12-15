@@ -2,7 +2,6 @@ package model
 
 type KontrolBalikResponse struct {
 	ID             int32           `json:"id"`
-	NoAntrean      int32           `json:"noAntrean"`
 	IdPasien       int32           `json:"idPasien,omitempty"`
 	PasienResponse *PasienResponse `json:"pasien,omitempty"`
 	BeratBadan     int32           `json:"beratBadan"`
@@ -33,7 +32,6 @@ type KontrolBalikCreateRequest struct {
 }
 type KontrolBalikUpdateRequest struct {
 	ID               int32  `json:"id" validate:"required,numeric"`
-	NoAntrean        int32  `json:"noAntrean" validate:"required,numeric,gt=0"`
 	IdPasien         int32  `json:"idPasien" validate:"required,numeric"`
 	TanggalKontrol   int64  `json:"tanggalKontrol" validate:"required,numeric"`
 	IdAdminPuskesmas int32  `validate:"omitempty,numeric"`
