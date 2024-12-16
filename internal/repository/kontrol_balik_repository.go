@@ -48,6 +48,18 @@ func (r *KontrolBalikRepository) FindByIdAndIdAdminPuskesmasAndStatus(db *gorm.D
 		Where("kontrol_balik.status = ?", status).
 		First(&kontrolBalik).Error
 }
+func (r *KontrolBalikRepository) FindByIdAndStatusNot(db *gorm.DB, kontrolBalik *entity.KontrolBalik, id int32, status string) error {
+	return db.Where("id = ?", id).
+		Where("status != ?", status).
+		First(&kontrolBalik).Error
+}
+func (r *KontrolBalikRepository) FindByIdAndIdAdminPuskesmasAndStatusNot(db *gorm.DB, kontrolBalik *entity.KontrolBalik, id int32, idAdminPuskesmas int32, status string) error {
+	return db.Joins("JOIN pasien ON pasien.id = kontrol_balik.id_pasien").
+		Where("kontrol_balik.id = ?", id).
+		Where("pasien.id_admin_puskesmas = ?", idAdminPuskesmas).
+		Where("kontrol_balik.status != ?", status).
+		First(&kontrolBalik).Error
+}
 func (r *KontrolBalikRepository) FindByIdAndIdAdminPuskesmasAndStatusOrStatus(db *gorm.DB, kontrolBalik *entity.KontrolBalik, id int32, idAdminPuskesmas int32, status1 string, status2 string) error {
 	return db.Joins("JOIN pasien ON pasien.id = kontrol_balik.id_pasien").
 		Where("kontrol_balik.id = ?", id).

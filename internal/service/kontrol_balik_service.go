@@ -111,11 +111,11 @@ func (s *KontrolBalikService) Get(ctx context.Context, request *model.KontrolBal
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
-		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
+		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusNot(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal); err != nil {
 			slog.Error(err.Error())
 			return nil, fiber.ErrNotFound
 		}
-	} else if err := s.KontrolBalikRepository.FindByIdAndStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikMenunggu); err != nil {
+	} else if err := s.KontrolBalikRepository.FindByIdAndStatusNot(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal); err != nil {
 		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
@@ -191,12 +191,12 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
-		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikMenunggu); err != nil {
+		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusNot(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal); err != nil {
 			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
-		if err := s.KontrolBalikRepository.FindByIdAndStatus(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikMenunggu); err != nil {
+		if err := s.KontrolBalikRepository.FindByIdAndStatusNot(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal); err != nil {
 			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
