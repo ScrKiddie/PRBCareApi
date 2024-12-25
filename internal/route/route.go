@@ -123,6 +123,7 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Patch("/api/prolanis/:id", c.ProlanisController.Update)
 	c.App.Delete("/api/prolanis/:id", c.ProlanisController.Delete)
 	c.App.Patch("/api/prolanis/:id/selesai", c.ProlanisController.Selesai)
+
 }
 
 func (c *Config) Setup() {

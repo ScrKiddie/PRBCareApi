@@ -41,7 +41,7 @@ func (r *PengambilanObatRepository) SearchAsAdminApotek(db *gorm.DB, pengambilan
 		query = query.Where("pengambilan_obat.status = ?", status)
 	}
 	return query.Preload("Pasien.AdminPuskesmas").
-		Preload("Pasien.Pengguna").
+		Preload("Pasien.Pengguna").Preload("Obat").
 		Find(&pengambilanObat).Error
 }
 func (r *PengambilanObatRepository) SearchAsPengguna(db *gorm.DB, pengambilanObat *[]entity.PengambilanObat, idPengguna int32, status string) error {
