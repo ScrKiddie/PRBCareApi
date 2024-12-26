@@ -111,11 +111,11 @@ func (s *KontrolBalikService) Get(ctx context.Context, request *model.KontrolBal
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
-		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusNot(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal); err != nil {
+		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusNot(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal, true, false); err != nil {
 			slog.Error(err.Error())
 			return nil, fiber.ErrNotFound
 		}
-	} else if err := s.KontrolBalikRepository.FindByIdAndStatusNot(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal); err != nil {
+	} else if err := s.KontrolBalikRepository.FindByIdAndStatusNot(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal, true, true); err != nil {
 		slog.Error(err.Error())
 		return nil, fiber.ErrNotFound
 	}
@@ -137,6 +137,26 @@ func (s *KontrolBalikService) Get(ctx context.Context, request *model.KontrolBal
 	response.HasilDiagnosa = kontrolBalik.HasilDiagnosa
 	response.TanggalKontrol = kontrolBalik.TanggalKontrol
 	response.IdPasien = kontrolBalik.IdPasien
+	response.PasienResponse = &model.PasienResponse{
+		ID:           kontrolBalik.Pasien.ID,
+		NoRekamMedis: kontrolBalik.Pasien.NoRekamMedis,
+		Pengguna: &model.PenggunaResponse{
+			NamaLengkap:     kontrolBalik.Pasien.Pengguna.NamaLengkap,
+			Telepon:         kontrolBalik.Pasien.Pengguna.Telepon,
+			TeleponKeluarga: kontrolBalik.Pasien.Pengguna.TeleponKeluarga,
+			Alamat:          kontrolBalik.Pasien.Pengguna.Alamat,
+		},
+		AdminPuskesmas: &model.AdminPuskesmasResponse{
+			ID:               kontrolBalik.Pasien.AdminPuskesmas.ID,
+			NamaPuskesmas:    kontrolBalik.Pasien.AdminPuskesmas.NamaPuskesmas,
+			Telepon:          kontrolBalik.Pasien.AdminPuskesmas.Telepon,
+			Alamat:           kontrolBalik.Pasien.AdminPuskesmas.Alamat,
+			WaktuOperasional: kontrolBalik.Pasien.AdminPuskesmas.WaktuOperasional,
+		},
+		TanggalDaftar: kontrolBalik.Pasien.TanggalDaftar,
+		Status:        kontrolBalik.Pasien.Status,
+	}
+
 	return response, nil
 }
 
@@ -191,26 +211,40 @@ func (s *KontrolBalikService) Update(ctx context.Context, request *model.Kontrol
 
 	kontrolBalik := new(entity.KontrolBalik)
 	if request.IdAdminPuskesmas > 0 {
-		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusNot(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal); err != nil {
+		if err := s.KontrolBalikRepository.FindByIdAndIdAdminPuskesmasAndStatusNot(tx, kontrolBalik, request.ID, request.IdAdminPuskesmas, constant.StatusKontrolBalikBatal, false, false); err != nil {
 			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	} else {
-		if err := s.KontrolBalikRepository.FindByIdAndStatusNot(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal); err != nil {
+		if err := s.KontrolBalikRepository.FindByIdAndStatusNot(tx, kontrolBalik, request.ID, constant.StatusKontrolBalikBatal, false, false); err != nil {
 			slog.Error(err.Error())
 			return fiber.ErrNotFound
 		}
 	}
 	pasien := new(entity.Pasien)
-	if request.IdAdminPuskesmas > 0 {
-		if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
-			slog.Error(err.Error())
-			return fiber.ErrNotFound
+	if request.IdPasien == kontrolBalik.IdPasien {
+		if request.IdAdminPuskesmas > 0 {
+			if err := s.PasienRepository.FindByIdAndIdAdminPuskesmas(tx, pasien, request.IdPasien, request.IdAdminPuskesmas); err != nil {
+				slog.Error(err.Error())
+				return fiber.ErrNotFound
+			}
+		} else {
+			if err := s.PasienRepository.FindById(tx, pasien, request.IdPasien); err != nil {
+				slog.Error(err.Error())
+				return fiber.ErrNotFound
+			}
 		}
 	} else {
-		if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.IdPasien, constant.StatusPasienAktif); err != nil {
-			slog.Error(err.Error())
-			return fiber.ErrNotFound
+		if request.IdAdminPuskesmas > 0 {
+			if err := s.PasienRepository.FindByIdAndIdAdminPuskesmasAndStatus(tx, pasien, request.IdPasien, request.IdAdminPuskesmas, constant.StatusPasienAktif); err != nil {
+				slog.Error(err.Error())
+				return fiber.ErrNotFound
+			}
+		} else {
+			if err := s.PasienRepository.FindByIdAndStatus(tx, pasien, request.IdPasien, constant.StatusPasienAktif); err != nil {
+				slog.Error(err.Error())
+				return fiber.ErrNotFound
+			}
 		}
 	}
 

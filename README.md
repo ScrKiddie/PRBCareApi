@@ -1,13 +1,13 @@
-# PRBCareAPI
+# PRB-Care-API
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/50eea6b6-e922-4dda-a036-3fbf1704458d" alt="prbcare" width="400">
 </p>
 
-PRBCareAPI adalah aplikasi REST API untuk manajemen Puskesmas, manajemen Apotek, pengambilan obat, kontrol balik, dan
+PRB-Care-API adalah aplikasi REST API untuk manajemen Puskesmas, manajemen Apotek, pengambilan obat, kontrol balik, dan
 manajemen pasien. Aplikasi ini menyediakan fungsionalitas khusus berdasarkan peran pengguna yang berbeda, termasuk Admin
 Super, Admin Puskesmas, Admin Apotek, dan Calon Pasien.
-PRBCareAPI dikembangkan dengan mengikuti prinsip-prinsip REST API untuk memastikan skalabilitas dan pemeliharaan yang
+PRB-Care-API dikembangkan dengan mengikuti prinsip-prinsip REST API untuk memastikan skalabilitas dan pemeliharaan yang
 mudah. Sistem autentikasi dilengkapi untuk memastikan keamanan data.
 
 ## Fitur
@@ -66,5 +66,5 @@ Lihat implementasi frontend untuk aplikasi PRBCareAPI di link berikut:
 Aplikasi scheduler mendukung pengingat melalui push notifikasi dan pembatalan jadwal secara otomatis. Informasi lebih
 lanjut dan dokumentasi aplikasi scheduler dapat diakses melalui link berikut:
 
-[Scheduler Application](https://github.com/scrkiddie/PRBCareScheduler)
+[Scheduler Application](https://github.com/Hilmi-Raif/PRB-Care-Scheduler)
 

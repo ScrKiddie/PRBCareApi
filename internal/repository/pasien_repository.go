@@ -40,6 +40,14 @@ func (r *PasienRepository) FindByIdAndStatus(db *gorm.DB, pasien *entity.Pasien,
 func (r *PasienRepository) FindByIdAndIdAdminPuskesmasAndStatus(db *gorm.DB, pasien *entity.Pasien, id int32, idAdminPuskesmas int32, status string) error {
 	return db.Where("id = ?", id).Where("id_admin_puskesmas = ?", idAdminPuskesmas).Where("status = ?", status).First(pasien).Error
 }
+
+func (r *PasienRepository) FindById(db *gorm.DB, pasien *entity.Pasien, id int32) error {
+	return db.Where("id = ?", id).First(pasien).Error
+}
+func (r *PasienRepository) FindByIdAndIdAdminPuskesmas(db *gorm.DB, pasien *entity.Pasien, id int32, idAdminPuskesmas int32) error {
+	return db.Where("id = ?", id).Where("id_admin_puskesmas = ?", idAdminPuskesmas).First(pasien).Error
+}
+
 func (r *PasienRepository) FindByIdAdminPuskesmas(db *gorm.DB, pasien *entity.Pasien, idAdminPuskesmas int32) error {
 	return db.Where("id_admin_puskesmas = ?", idAdminPuskesmas).First(pasien).Error
 }
